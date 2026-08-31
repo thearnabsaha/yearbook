@@ -50,7 +50,7 @@ export default function Home() {
       <footer className="border-t border-[#e7e1d3] bg-white py-6 text-center text-xs text-[#78716c]">
         <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center justify-center gap-2">
-            <span className="font-serif-editorial font-bold text-[#1c1917]">Yearbook</span>
+            <span className="font-bold text-[#1c1917]">Yearbook</span>
             <span>•</span>
             <span className="text-[#78716c]">Daily Photo Growth Studio</span>
           </div>

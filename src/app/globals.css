@@ -3,9 +3,9 @@
 :root {
   --background: #fbf9f5;
   --foreground: #1c1917;
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-outfit), var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-outfit), var(--font-sans);
-  --font-serif: var(--font-serif-display), Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-outfit), var(--font-sans);
 }
 
 html, body {
@@ -17,11 +17,11 @@ html, body {
   width: 100%;
 }
 
-.font-serif-editorial {
-  font-family: var(--font-serif);
+*, button, input, select, textarea {
+  font-family: var(--font-sans);
 }
 
-h1, h2, h3, h4, .font-display {
+.font-serif-editorial, .font-display, h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
 }
 

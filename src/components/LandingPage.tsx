@@ -13,10 +13,8 @@ import {
   Play,
   Pause,
   RotateCcw,
-  CheckCircle2,
   Sliders,
   Calendar,
-  Camera,
   Upload,
   Heart,
   ChevronRight,
@@ -101,21 +99,19 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
   }, [isPlayingDemo]);
 
   const activeDemo = DEMO_FRAMES[currentFrameIdx];
-  const prevDemo = DEMO_FRAMES[(currentFrameIdx - 1 + DEMO_FRAMES.length) % DEMO_FRAMES.length];
 
   return (
     <div className="relative min-h-screen bg-[#fbf9f5] text-[#1c1917] overflow-x-hidden selection:bg-[#c27838]/20 selection:text-[#a85d26]">
-      {/* Editorial Decorative Background Elements */}
+      {/* Decorative Glows */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-30">
         <div className="absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-radial from-[#c27838]/15 via-[#f5f1e8] to-transparent blur-3xl" />
         <div className="absolute top-1/3 -left-40 h-[500px] w-[500px] rounded-full bg-radial from-[#a85d26]/10 via-[#f5f1e8] to-transparent blur-3xl" />
-        <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-radial from-[#c27838]/10 via-[#f5f1e8] to-transparent blur-3xl" />
       </div>
 
-      {/* Top Maximalist Editorial Navigation Bar */}
+      {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 border-b border-[#e7e1d3] bg-[#fbf9f5]/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3">
-          <div className="flex items-center gap-2 sm:gap-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2.5">
             <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl overflow-hidden shadow-xs ring-1 ring-[#c27838]/30 shrink-0">
               <img
                 src="/icons/icon-192.png"
@@ -123,7 +119,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                 className="h-full w-full object-cover"
               />
             </div>
-            <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
+            <span className="text-xl font-bold tracking-tight text-[#1c1917]">
               Year<span className="text-[#c27838]">book</span>
             </span>
           </div>
@@ -140,7 +136,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
         </div>
       </header>
 
-      {/* Hero Section: Editorial */}
+      {/* Hero Section */}
       <section className="relative mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 sm:pt-18 sm:pb-24">
         {/* Clean Top Tag */}
         <div className="flex justify-center mb-6">
@@ -152,11 +148,11 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
 
         {/* Main Headline */}
         <div className="text-center max-w-4xl mx-auto space-y-6">
-          <h1 className="font-serif-editorial text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#1c1917] leading-[1.08]">
-            The daily architecture of <span className="italic text-[#c27838] font-normal underline decoration-[#c27838]/40 decoration-wavy">time</span>, sculpted frame by frame.
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#1c1917] leading-[1.08]">
+            The daily architecture of <span className="text-[#c27838]">time</span>, sculpted frame by frame.
           </h1>
 
-          <p className="text-base sm:text-xl text-[#78716c] font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-xl text-[#78716c] font-normal max-w-2xl mx-auto leading-relaxed">
             One photo every day. Automatically eye-locked with zero manual effort, snapchat captioned, and rendered into fluid, life-transforming timelapse cinema.
           </p>
 
@@ -173,7 +169,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
 
             <a
               href="#interactive-demo"
-              className="flex items-center gap-2 rounded-2xl border border-[#e7e1d3] bg-white px-6 py-4 text-sm sm:text-base font-medium text-[#1c1917] hover:bg-[#f5f1e8] hover:border-[#c27838] transition-all cursor-pointer shadow-xs"
+              className="flex items-center gap-2 rounded-2xl border border-[#e7e1d3] bg-white px-6 py-4 text-sm sm:text-base font-semibold text-[#1c1917] hover:bg-[#f5f1e8] hover:border-[#c27838] transition-all cursor-pointer shadow-xs"
             >
               <Play className="h-4 w-4 text-[#c27838]" />
               <span>Explore Interactive Demo</span>
@@ -181,7 +177,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
           </div>
         </div>
 
-        {/* Maximalist Floating Polaroids Collage */}
+        {/* Floating Polaroids Collage */}
         <div className="mt-14 relative mx-auto max-w-5xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 items-end">
             {/* Polaroid 1 */}
@@ -197,13 +193,13 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                   The Beginning • Jan 01
                 </div>
               </div>
-              <div className="mt-2.5 px-1 flex justify-between items-center text-[11px] font-serif-editorial text-[#78716c]">
+              <div className="mt-2.5 px-1 flex justify-between items-center text-[11px] font-semibold text-[#78716c]">
                 <span>Frame #001</span>
                 <span className="text-[#c27838] font-mono">00:00.06s</span>
               </div>
             </div>
 
-            {/* Polaroid 2 (Prominent Center) */}
+            {/* Polaroid 2 */}
             <div className="polaroid-card rounded-2xl p-3 sm:p-4 rotate-[2deg] transform hover:rotate-0 transition-transform md:-translate-y-4 shadow-xl">
               <div className="relative aspect-3/4 overflow-hidden rounded-xl bg-stone-900 flex flex-col items-center justify-center text-white text-center p-3 border border-stone-800">
                 <div className="absolute top-2 left-2 rounded-full bg-emerald-600 px-2 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider">
@@ -220,7 +216,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                   Spring Growth • Mar 31
                 </div>
               </div>
-              <div className="mt-2.5 px-1 flex justify-between items-center text-[11px] font-serif-editorial text-[#78716c]">
+              <div className="mt-2.5 px-1 flex justify-between items-center text-[11px] font-semibold text-[#78716c]">
                 <span>Frame #090</span>
                 <span className="text-emerald-600 font-mono">Auto-Aligned</span>
               </div>
@@ -239,7 +235,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                   Summer Shift • Jun 30
                 </div>
               </div>
-              <div className="mt-2.5 px-1 flex justify-between items-center text-[11px] font-serif-editorial text-[#78716c]">
+              <div className="mt-2.5 px-1 flex justify-between items-center text-[11px] font-semibold text-[#78716c]">
                 <span>Frame #180</span>
                 <span className="text-amber-600 font-mono">Snapchat Bar</span>
               </div>
@@ -258,14 +254,14 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                   Full Year Cinema • Dec 31
                 </div>
               </div>
-              <div className="mt-2.5 px-1 flex justify-between items-center text-[11px] font-serif-editorial text-[#78716c]">
+              <div className="mt-2.5 px-1 flex justify-between items-center text-[11px] font-semibold text-[#78716c]">
                 <span>Frame #365</span>
                 <span className="text-purple-600 font-mono">15 FPS Export</span>
               </div>
             </div>
           </div>
 
-          {/* Editorial Stamps Overlaid */}
+          {/* Stamps Overlaid */}
           <div className="hidden sm:flex absolute -bottom-6 left-8 items-center gap-2 rounded-2xl bg-[#1c1917] px-4 py-2 text-white shadow-xl border border-stone-800 -rotate-3">
             <Eye className="h-4 w-4 text-[#c27838]" />
             <span className="text-xs font-mono font-bold tracking-tight">
@@ -276,14 +272,14 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
           <div className="hidden sm:flex absolute -top-4 right-8 items-center gap-2 rounded-2xl bg-white px-4 py-2 text-[#1c1917] shadow-xl border border-[#e7e1d3] rotate-3">
             <Database className="h-4 w-4 text-[#c27838]" />
             <span className="text-xs font-semibold tracking-tight">
-              MongoDB Atlas Cloud Sync
+              MongoDB Cloud Sync
             </span>
           </div>
         </div>
       </section>
 
-      {/* Infinite Golden Marquee Ribbon */}
-      <section className="border-y border-[#e7e1d3] bg-[#f5f1e8] py-4 overflow-hidden">
+      {/* Marquee Ribbon */}
+      <section className="border-y border-[#e7e1d3] bg-[#f5f1e8] py-3.5 overflow-hidden">
         <div className="animate-marquee flex items-center gap-8 whitespace-nowrap text-xs font-bold uppercase tracking-widest text-[#78716c]">
           <span className="flex items-center gap-2 text-[#c27838]">
             <Sparkles className="h-3.5 w-3.5" /> 365 DAILY FRAMES
@@ -301,8 +297,6 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
           <span>•</span>
           <span className="text-[#1c1917]">CINEMATIC 15 FPS VIDEO RENDERER</span>
           <span>•</span>
-          <span>PHONE • LAPTOP • IPAD OPTIMIZED</span>
-          <span>•</span>
           {/* Repeated for smooth loop */}
           <span className="flex items-center gap-2 text-[#c27838]">
             <Sparkles className="h-3.5 w-3.5" /> 365 DAILY FRAMES
@@ -313,9 +307,6 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
           <span className="text-[#1c1917]">ONION-SKIN GHOST REFERENCE LAYER</span>
           <span>•</span>
           <span>80% LOSSLESS WEBP COMPRESSION</span>
-          <span>•</span>
-          <span className="text-[#c27838]">MONGODB ATLAS HYBRID SYNC</span>
-          <span>•</span>
         </div>
       </section>
 
@@ -326,7 +317,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
             <Film className="h-3.5 w-3.5" />
             <span>Interactive Simulator</span>
           </div>
-          <h2 className="font-serif-editorial text-3xl sm:text-5xl font-bold tracking-tight text-[#1c1917]">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1c1917]">
             Witness the steady flow of time.
           </h2>
           <p className="text-xs sm:text-sm text-[#78716c]">
@@ -423,16 +414,16 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
               </div>
             </div>
 
-            {/* Right: Scrubber & Interactive Controls */}
+            {/* Right: Scrubber & Controls */}
             <div className="md:col-span-5 space-y-6">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#c27838]">
                   Frame {currentFrameIdx + 1} of {DEMO_FRAMES.length}
                 </span>
-                <h3 className="font-serif-editorial text-2xl font-bold text-[#1c1917] mt-1">
+                <h3 className="text-2xl font-bold text-[#1c1917] mt-1">
                   {activeDemo.date}
                 </h3>
-                <p className="text-xs text-[#78716c] mt-1 italic font-serif-editorial">
+                <p className="text-xs text-[#78716c] mt-1 font-medium">
                   &ldquo;{activeDemo.quote}&rdquo;
                 </p>
               </div>
@@ -533,23 +524,23 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
         </div>
       </section>
 
-      {/* Maximalist Feature Bento Grid */}
+      {/* Feature Bento Matrix */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 border-t border-[#e7e1d3]">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
           <span className="text-xs font-bold uppercase tracking-widest text-[#c27838]">
             Craftsmanship & Precision
           </span>
-          <h2 className="font-serif-editorial text-3xl sm:text-5xl font-bold tracking-tight text-[#1c1917]">
-            Built like an editorial atelier.
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1c1917]">
+            Engineered for daily ritual.
           </h2>
           <p className="text-xs sm:text-sm text-[#78716c]">
-            Every single feature has been engineered for zero-friction daily ritual, maximum privacy, and flawless timelapse continuity.
+            Every feature has been built for zero-friction capture, absolute privacy, and seamless timelapse continuity.
           </p>
         </div>
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card 1: Zero-Manual Eye Alignment */}
+          {/* Card 1 */}
           <div className="md:col-span-2 rounded-3xl border border-[#e7e1d3] bg-white p-8 shadow-sm hover:border-[#c27838] transition-all group">
             <div className="flex items-center justify-between mb-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f5f1e8] text-[#c27838] border border-[#e7e1d3]">
@@ -559,7 +550,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                 100% Automatic
               </span>
             </div>
-            <h3 className="font-serif-editorial text-2xl font-bold text-[#1c1917] mb-2">
+            <h3 className="text-2xl font-bold text-[#1c1917] mb-2">
               Automatic Eye & Landmark Normalization
             </h3>
             <p className="text-xs sm:text-sm text-[#78716c] leading-relaxed max-w-xl mb-6">
@@ -571,7 +562,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
             </div>
           </div>
 
-          {/* Card 2: Lossless WebP Compression */}
+          {/* Card 2 */}
           <div className="rounded-3xl border border-[#e7e1d3] bg-white p-8 shadow-sm hover:border-[#c27838] transition-all">
             <div className="flex items-center justify-between mb-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f5f1e8] text-[#c27838] border border-[#e7e1d3]">
@@ -581,7 +572,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                 80% Savings
               </span>
             </div>
-            <h3 className="font-serif-editorial text-xl font-bold text-[#1c1917] mb-2">
+            <h3 className="text-xl font-bold text-[#1c1917] mb-2">
               Lossless Compression
             </h3>
             <p className="text-xs text-[#78716c] leading-relaxed mb-4">
@@ -592,7 +583,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
             </div>
           </div>
 
-          {/* Card 3: Snapchat Caption Bar */}
+          {/* Card 3 */}
           <div className="rounded-3xl border border-[#e7e1d3] bg-white p-8 shadow-sm hover:border-[#c27838] transition-all">
             <div className="flex items-center justify-between mb-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f5f1e8] text-[#c27838] border border-[#e7e1d3]">
@@ -602,7 +593,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                 Overlay Bar
               </span>
             </div>
-            <h3 className="font-serif-editorial text-xl font-bold text-[#1c1917] mb-2">
+            <h3 className="text-xl font-bold text-[#1c1917] mb-2">
               Snapchat Style Captions
             </h3>
             <p className="text-xs text-[#78716c] leading-relaxed mb-4">
@@ -613,7 +604,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
             </div>
           </div>
 
-          {/* Card 4: Onion-Skin Ghost Layer */}
+          {/* Card 4 */}
           <div className="rounded-3xl border border-[#e7e1d3] bg-white p-8 shadow-sm hover:border-[#c27838] transition-all">
             <div className="flex items-center justify-between mb-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f5f1e8] text-[#c27838] border border-[#e7e1d3]">
@@ -623,7 +614,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                 Precision Guide
               </span>
             </div>
-            <h3 className="font-serif-editorial text-xl font-bold text-[#1c1917] mb-2">
+            <h3 className="text-xl font-bold text-[#1c1917] mb-2">
               Onion-Skin Ghosting
             </h3>
             <p className="text-xs text-[#78716c] leading-relaxed mb-4">
@@ -634,7 +625,7 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
             </div>
           </div>
 
-          {/* Card 5: MongoDB Cloud Sync */}
+          {/* Card 5 */}
           <div className="rounded-3xl border border-[#e7e1d3] bg-white p-8 shadow-sm hover:border-[#c27838] transition-all">
             <div className="flex items-center justify-between mb-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f5f1e8] text-[#c27838] border border-[#e7e1d3]">
@@ -644,11 +635,11 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                 Atlas Connected
               </span>
             </div>
-            <h3 className="font-serif-editorial text-xl font-bold text-[#1c1917] mb-2">
+            <h3 className="text-xl font-bold text-[#1c1917] mb-2">
               Hybrid Cloud Sync
             </h3>
             <p className="text-xs text-[#78716c] leading-relaxed mb-4">
-              Instant offline IndexedDB local speed coupled with background MongoDB Atlas replication across Phone, Laptop, and iPad.
+              Instant offline local speed coupled with background MongoDB Atlas replication across Phone, Laptop, and iPad.
             </p>
             <div className="rounded-2xl bg-emerald-50 p-3 text-center border border-emerald-200">
               <span className="text-xs font-semibold text-emerald-800">1-Click Multi-Device Sync</span>
@@ -657,43 +648,33 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
         </div>
       </section>
 
-      {/* Philosophical Quote Block */}
-      <section className="border-t border-[#e7e1d3] bg-white py-20">
-        <div className="mx-auto max-w-4xl px-4 text-center space-y-6">
-          <div className="flex justify-center">
-            <div className="h-10 w-10 rounded-full bg-[#f5f1e8] border border-[#e7e1d3] flex items-center justify-center text-[#c27838]">
-              <Compass className="h-5 w-5" />
-            </div>
-          </div>
-          <blockquote className="font-serif-editorial text-2xl sm:text-4xl font-normal italic text-[#1c1917] leading-relaxed">
-            &ldquo;We do not remember days, we remember moments — and the imperceptible drift of who we were into who we are becoming.&rdquo;
+      {/* Quote Block */}
+      <section className="border-t border-[#e7e1d3] bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center space-y-4">
+          <blockquote className="text-xl sm:text-3xl font-bold tracking-tight text-[#1c1917] leading-relaxed">
+            &ldquo;We do not remember days, we remember moments — and the subtle evolution of who we are becoming.&rdquo;
           </blockquote>
-          <div className="text-xs font-mono uppercase tracking-widest text-[#78716c]">
-            YEARBOOK ATELIER • 365 DAYS CHRONICLE
-          </div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#c27838]">
+            Daily Photo Progression Studio
+          </p>
         </div>
       </section>
 
-      {/* Bottom Maximalist CTA */}
-      <section className="border-t border-[#e7e1d3] bg-[#fbf9f5] py-20">
-        <div className="mx-auto max-w-4xl px-4 text-center space-y-8">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#1c1917] px-4 py-1.5 text-xs font-semibold text-white shadow-sm">
-            <Sparkles className="h-3.5 w-3.5 text-[#c27838]" />
-            <span>Ready to begin Day 1?</span>
-          </div>
-
-          <h2 className="font-serif-editorial text-4xl sm:text-6xl font-bold tracking-tight text-[#1c1917]">
+      {/* Bottom CTA */}
+      <section className="border-t border-[#e7e1d3] bg-[#fbf9f5] py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center space-y-6">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1c1917]">
             Your lifetime timelapse starts with today&apos;s photo.
           </h2>
 
-          <p className="text-sm sm:text-base text-[#78716c] max-w-xl mx-auto">
-            Create your first yearbook project, upload a photo, and experience the zero-manual alignment engine in seconds.
+          <p className="text-sm sm:text-base text-[#78716c] max-w-lg mx-auto">
+            Upload your first photo, align eyes automatically, and generate your fluid video timelapse.
           </p>
 
-          <div className="pt-4 flex justify-center">
+          <div className="pt-2 flex justify-center">
             <button
               onClick={onEnterApp}
-              className="group flex items-center gap-3 rounded-2xl bg-[#c27838] px-10 py-5 text-base sm:text-lg font-semibold text-white shadow-2xl shadow-[#c27838]/25 hover:bg-[#a85d26] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              className="group flex items-center gap-3 rounded-2xl bg-[#c27838] px-8 py-4 text-sm sm:text-base font-semibold text-white shadow-xl shadow-[#c27838]/20 hover:bg-[#a85d26] hover:scale-105 active:scale-95 transition-all cursor-pointer"
             >
               <Sparkles className="h-5 w-5" />
               <span>Launch Yearbook Studio</span>
@@ -703,30 +684,33 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
         </div>
       </section>
 
-      {/* Maximalist Footer */}
-      <footer className="border-t border-[#e7e1d3] bg-white py-12 text-center text-xs text-[#78716c]">
+      {/* Clean Minimalist Footer */}
+      <footer className="border-t border-[#e7e1d3] bg-white py-8 text-center text-xs text-[#78716c]">
         <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <div className="relative flex h-8 w-8 items-center justify-center rounded-xl overflow-hidden shadow-xs ring-1 ring-[#c27838]/30">
               <img
                 src="/icons/icon-192.png"
-                alt="Yearbook Crest"
+                alt="Yearbook"
                 className="h-full w-full object-cover"
               />
             </div>
-            <span className="font-display text-base font-bold text-[#1c1917]">
+            <span className="font-bold text-base text-[#1c1917]">
               Year<span className="text-[#c27838]">book</span>
             </span>
-            <span>•</span>
-            <span className="text-[#c27838] font-medium">Daily Photo Growth Atelier</span>
+            <span className="text-stone-300">•</span>
+            <span className="text-[#78716c] font-medium">Daily Photo Studio</span>
           </div>
 
-          <div className="flex items-center gap-6 text-[11px]">
-            <span>100% Offline PWA</span>
+          <div className="flex items-center gap-4 text-xs font-medium text-[#78716c]">
+            <span>100% Private & Client-Side</span>
             <span>•</span>
-            <span>MongoDB Cloud Sync</span>
-            <span>•</span>
-            <span>Lossless WebP</span>
+            <button
+              onClick={onEnterApp}
+              className="text-[#c27838] hover:underline font-semibold cursor-pointer"
+            >
+              Open Studio ➔
+            </button>
           </div>
         </div>
       </footer>
