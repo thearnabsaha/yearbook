@@ -92,9 +92,21 @@ export async function deleteYearbookProjectFromCloud(id: string): Promise<void> 
 // Sync single Yearbook Entry to Cloud
 export async function syncYearbookEntryToCloud(entry: YearbookEntry): Promise<boolean> {
   try {
+    let photoToSend = entry.photoBlob;
+    // Keep cloud payload ultra fast & safely below Vercel serverless bounds
+    if (photoToSend.size > 1500 * 1024) {
+      try {
+        const { compressImageLossless } = await import('./compression');
+        const comp = await compressImageLossless(photoToSend, { maxDimension: 2048, quality: 0.92 });
+        photoToSend = comp.compressedBlob;
+      } catch {
+        // Fallback to original
+      }
+    }
+
     const [photoBase64, thumbnailBase64] = await Promise.all([
-      blobToBase64(entry.photoBlob),
-      blobToBase64(entry.thumbnailBlob),
+      blobToBase64(photoToSend),
+      blobToBase64(entry.thumbnailBlob || photoToSend),
     ]);
 
     const res = await fetch('/api/yearbook-entries', {

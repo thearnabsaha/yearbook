@@ -382,7 +382,7 @@ export default function YearbookPhotoEditorModal({
 
   const handleSave = async () => {
     if (!previewCanvasRef.current || !sourceBlob) {
-      alert('Please add a photo for this date first.');
+      alert('Please add or select a photo first.');
       return;
     }
 
@@ -390,45 +390,68 @@ export default function YearbookPhotoEditorModal({
     try {
       const canvas = previewCanvasRef.current;
 
-      canvas.toBlob(
-        async (renderedBlob) => {
-          if (!renderedBlob) {
-            setIsSaving(false);
-            return;
+      const getBlobPromise = (): Promise<Blob> => {
+        return new Promise((resolve, reject) => {
+          try {
+            canvas.toBlob(
+              (b) => {
+                if (b) {
+                  resolve(b);
+                } else {
+                  // Fallback to jpeg
+                  canvas.toBlob(
+                    (b2) => {
+                      if (b2) resolve(b2);
+                      else reject(new Error('Failed to generate image blob from canvas'));
+                    },
+                    'image/jpeg',
+                    0.95
+                  );
+                }
+              },
+              'image/webp',
+              0.98
+            );
+          } catch (e) {
+            reject(e);
           }
+        });
+      };
 
-          const pId = currentProject?.id || 'yb_main';
-          const entryId = `yearbook_${pId}_${selectedDate}`;
-          const record = await saveYearbookEntry({
-            id: entryId,
-            yearbookId: pId,
-            date: selectedDate,
-            photoBlob: renderedBlob,
-            caption,
-            captionY,
-            captionStyle,
-            aspectRatio,
-            showDateStamp,
-            showDayCount,
-            alignment,
-            crop: DEFAULT_CROP,
-            filters: DEFAULT_FILTERS,
-            preset: 'none',
-          });
+      const renderedBlob = await getBlobPromise();
+      const pId = currentProject?.id || 'yb_main';
+      const entryId = `yearbook_${pId}_${selectedDate}`;
 
-          onEntrySaved(record);
-          if (currentProject) {
-            syncYearbookProjectToCloud(currentProject);
-          }
-          await syncYearbookEntryToCloud(record);
-          setIsSaving(false);
-          onClose();
-        },
-        'image/webp',
-        0.98
-      );
-    } catch (err) {
+      const record = await saveYearbookEntry({
+        id: entryId,
+        yearbookId: pId,
+        date: selectedDate,
+        photoBlob: renderedBlob,
+        caption,
+        captionY,
+        captionStyle,
+        aspectRatio,
+        showDateStamp,
+        showDayCount,
+        alignment,
+        crop: DEFAULT_CROP,
+        filters: DEFAULT_FILTERS,
+        preset: 'none',
+      });
+
+      // 1. Immediately update UI and close modal
+      onEntrySaved(record);
+      setIsSaving(false);
+      onClose();
+
+      // 2. Background sync to MongoDB Atlas
+      if (currentProject) {
+        syncYearbookProjectToCloud(currentProject);
+      }
+      syncYearbookEntryToCloud(record);
+    } catch (err: any) {
       console.error('Error saving yearbook entry:', err);
+      alert('Error saving photo: ' + (err.message || 'Unknown error'));
       setIsSaving(false);
     }
   };

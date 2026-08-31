@@ -258,17 +258,26 @@ export async function saveYearbookEntry(
   entry: Omit<YearbookEntry, 'thumbnailBlob' | 'createdAt' | 'updatedAt'> & {
     createdAt?: number;
     updatedAt?: number;
+    thumbnailBlob?: Blob;
   }
 ): Promise<YearbookEntry> {
-  const comp = await compressImageLossless(entry.photoBlob, { maxDimension: 2560, quality: 0.95 });
-  const { thumbnailBlob } = await createThumbnailBlob(comp.compressedBlob);
-  const now = Date.now();
+  let thumb = entry.thumbnailBlob;
+  if (!thumb) {
+    try {
+      const res = await createThumbnailBlob(entry.photoBlob, 400);
+      thumb = res.thumbnailBlob;
+    } catch (e) {
+      console.warn('Thumbnail generation fallback to photoBlob:', e);
+      thumb = entry.photoBlob;
+    }
+  }
 
+  const now = Date.now();
   const record: YearbookEntry = {
     ...entry,
-    photoBlob: comp.compressedBlob,
+    photoBlob: entry.photoBlob,
     alignment: entry.alignment || DEFAULT_ALIGNMENT,
-    thumbnailBlob,
+    thumbnailBlob: thumb || entry.photoBlob,
     createdAt: entry.createdAt || now,
     updatedAt: now,
   };
