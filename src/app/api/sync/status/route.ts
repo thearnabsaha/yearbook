@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 export async function GET() {
   try {
     if (!process.env.MONGODB_URI) {
       return NextResponse.json({
         connected: false,
-        message: 'MONGODB_URI is not set in environment variables.',
+        message: 'MONGODB_URI is not configured in Vercel Environment Variables.',
       });
     }
 
@@ -29,7 +31,7 @@ export async function GET() {
       },
     });
   } catch (err: any) {
-    console.error('MongoDB sync status error:', err);
+    console.error('Vercel Function: MongoDB sync status error:', err);
     return NextResponse.json(
       {
         connected: false,
