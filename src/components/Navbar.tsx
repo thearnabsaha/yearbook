@@ -21,11 +21,13 @@ import {
 interface NavbarProps {
   onOpenBackup: () => void;
   yearbookCount: number;
+  onToggleLanding?: () => void;
 }
 
 export default function Navbar({
   onOpenBackup,
   yearbookCount,
+  onToggleLanding,
 }: NavbarProps) {
   const [storageInfo, setStorageInfo] = useState<StorageQuotaInfo | null>(null);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
@@ -134,6 +136,17 @@ export default function Navbar({
                   {storageInfo.usageFormatted}
                 </span>
               </div>
+            </button>
+          )}
+
+          {/* Overview / Landing Button */}
+          {onToggleLanding && (
+            <button
+              onClick={onToggleLanding}
+              className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-[#f5f1e8] px-3.5 py-2 text-xs font-medium text-[#1c1917] hover:bg-[#e7e1d3] transition-all cursor-pointer"
+              title="View Landing Page Overview"
+            >
+              <span>Overview</span>
             </button>
           )}
 

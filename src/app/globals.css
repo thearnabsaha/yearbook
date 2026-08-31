@@ -5,6 +5,7 @@
   --foreground: #1c1917;
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-outfit), var(--font-sans);
+  --font-serif: var(--font-serif-display), Georgia, "Times New Roman", serif;
 }
 
 body {
@@ -14,8 +15,39 @@ body {
   overflow-x: hidden;
 }
 
+.font-serif-editorial {
+  font-family: var(--font-serif);
+}
+
 h1, h2, h3, h4, .font-display {
   font-family: var(--font-display);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Polaroids & Editorial Shadows */
+.polaroid-card {
+  background: #ffffff;
+  box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.08), 0 0 0 1px rgba(231, 225, 211, 0.8);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.polaroid-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px -10px rgba(194, 120, 56, 0.15), 0 0 0 1px rgba(194, 120, 56, 0.4);
 }
 
 /* Custom Warm Cream Scrollbars */

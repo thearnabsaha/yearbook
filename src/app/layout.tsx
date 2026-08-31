@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Outfit } from 'next/font/google';
+import { Inter, Outfit, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import PWARegister from '@/components/PWARegister';
 
@@ -10,6 +10,11 @@ const inter = Inter({
 
 const outfit = Outfit({
   variable: '--font-outfit',
+  subsets: ['latin'],
+});
+
+const playfair = Playfair_Display({
+  variable: '--font-serif-display',
   subsets: ['latin'],
 });
 
@@ -43,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${playfair.variable} h-full`}>
       <head>
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
