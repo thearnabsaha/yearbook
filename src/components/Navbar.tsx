@@ -71,8 +71,12 @@ export default function Navbar({
       <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3">
         {/* Brand & Status */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#c27838] text-white shadow-xs">
-            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+          <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-xs ring-1 ring-[#c27838]/30">
+            <img
+              src="/icons/icon-192.png"
+              alt="Yearbook Crest"
+              className="h-full w-full object-cover"
+            />
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">

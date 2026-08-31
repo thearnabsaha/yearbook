@@ -116,8 +116,12 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
       <header className="sticky top-0 z-50 border-b border-[#e7e1d3] bg-[#fbf9f5]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[#c27838] text-white shadow-sm ring-2 ring-[#c27838]/20 shrink-0">
-              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+            <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl overflow-hidden shadow-xs ring-1 ring-[#c27838]/30 shrink-0">
+              <img
+                src="/icons/icon-192.png"
+                alt="Yearbook Crest"
+                className="h-full w-full object-cover"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -714,8 +718,12 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
       <footer className="border-t border-[#e7e1d3] bg-white py-12 text-center text-xs text-[#78716c]">
         <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#c27838] text-white">
-              <Sparkles className="h-4 w-4" />
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-xl overflow-hidden shadow-xs ring-1 ring-[#c27838]/30">
+              <img
+                src="/icons/icon-192.png"
+                alt="Yearbook Crest"
+                className="h-full w-full object-cover"
+              />
             </div>
             <span className="font-serif-editorial text-base font-bold text-[#1c1917]">
               Year<span className="text-[#c27838] italic">book</span>
