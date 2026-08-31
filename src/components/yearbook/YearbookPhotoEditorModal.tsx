@@ -80,7 +80,7 @@ export default function YearbookPhotoEditorModal({
 
   // Caption & Snapchat styling
   const [caption, setCaption] = useState(existingEntry?.caption || '');
-  const [captionY, setCaptionY] = useState(existingEntry?.captionY ?? 75);
+  const [captionY, setCaptionY] = useState(existingEntry?.captionY ?? 70);
   const [captionStyle, setCaptionStyle] = useState<'snapchat' | 'minimal' | 'badge' | 'neon'>(
     existingEntry?.captionStyle || 'snapchat'
   );
@@ -110,7 +110,7 @@ export default function YearbookPhotoEditorModal({
           if (!isCancelled && entry?.photoBlob) {
             setSourceBlob(entry.photoBlob);
             setCaption(entry.caption || '');
-            setCaptionY(entry.captionY ?? 75);
+            setCaptionY(entry.captionY ?? 70);
             setCaptionStyle(entry.captionStyle || 'snapchat');
             setAspectRatio(entry.aspectRatio || currentProject.aspectRatio || '9:16');
             setShowDateStamp(entry.showDateStamp ?? true);

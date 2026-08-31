@@ -524,7 +524,7 @@ export async function importDatabaseBackup(
         photoBlob,
         thumbnailBlob,
         caption: yMeta.caption || '',
-        captionY: yMeta.captionY ?? 75,
+        captionY: yMeta.captionY ?? 70,
         captionStyle: yMeta.captionStyle || 'snapchat',
         aspectRatio: yMeta.aspectRatio || '9:16',
         showDateStamp: Boolean(yMeta.showDateStamp),

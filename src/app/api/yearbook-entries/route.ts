@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
           photoBase64: data.photoBase64,
           thumbnailBase64: data.thumbnailBase64,
           caption: data.caption || '',
-          captionY: data.captionY ?? 75,
+          captionY: data.captionY ?? 70,
           captionStyle: data.captionStyle || 'snapchat',
           aspectRatio: data.aspectRatio || '9:16',
           showDateStamp: data.showDateStamp ?? true,

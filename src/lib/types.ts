@@ -140,7 +140,7 @@ export interface YearbookEntry {
   photoBlob: Blob;
   thumbnailBlob: Blob;
   caption: string;
-  captionY: number; // vertical position in percentage (0 to 100, default 75)
+  captionY: number; // vertical position in percentage (0 to 100, default 70)
   captionStyle: 'snapchat' | 'minimal' | 'badge' | 'neon';
   aspectRatio: YearbookAspectRatio;
   showDateStamp: boolean;
