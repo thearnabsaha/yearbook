@@ -13,20 +13,38 @@ export default function Home() {
   const [currentView, setCurrentView] = useState<'landing' | 'studio'>('landing');
   const [isBackupOpen, setIsBackupOpen] = useState(false);
 
-  // Check URL parameter on load
+  // Check saved view preference or URL parameter on load
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('view') === 'studio') {
+      const urlView = params.get('view');
+      const savedView = localStorage.getItem('yearbook_view');
+
+      if (urlView === 'studio' || savedView === 'studio') {
+        setCurrentView('studio');
+      } else if (urlView === 'landing') {
+        setCurrentView('landing');
+      } else if (yearbookEntries.length > 0 && savedView !== 'landing') {
+        // If user already has photos, stay directly in the studio
         setCurrentView('studio');
       }
     }
-  }, []);
+  }, [yearbookEntries.length]);
+
+  const handleSetView = (view: 'landing' | 'studio') => {
+    setCurrentView(view);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('yearbook_view', view);
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', view);
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
 
   if (currentView === 'landing') {
     return (
       <LandingPage
-        onEnterApp={() => setCurrentView('studio')}
+        onEnterApp={() => handleSetView('studio')}
         yearbookCount={yearbookEntries.length}
       />
     );
@@ -38,7 +56,7 @@ export default function Home() {
       <Navbar
         yearbookCount={yearbookEntries.length}
         onOpenBackup={() => setIsBackupOpen(true)}
-        onToggleLanding={() => setCurrentView('landing')}
+        onToggleLanding={() => handleSetView('landing')}
       />
 
       {/* Main Yearbook Studio */}
@@ -56,7 +74,7 @@ export default function Home() {
           </div>
           <div className="flex items-center justify-center gap-4">
             <button
-              onClick={() => setCurrentView('landing')}
+              onClick={() => handleSetView('landing')}
               className="text-[#c27838] hover:underline font-medium cursor-pointer"
             >
               Landing Page
