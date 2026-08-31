@@ -422,7 +422,7 @@ export default function YearbookPhotoEditorModal({
           onClose();
         },
         'image/webp',
-        0.92
+        0.98
       );
     } catch (err) {
       console.error('Error saving yearbook entry:', err);

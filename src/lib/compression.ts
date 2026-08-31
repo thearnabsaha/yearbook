@@ -15,9 +15,9 @@ export interface CompressionResult {
 }
 
 export interface CompressionOptions {
-  maxDimension?: number; // e.g. 2560 for 2K/4K max bounds
+  maxDimension?: number; // 3840 for 4K Ultra-HD max bounds
   format?: 'image/webp' | 'image/png' | 'image/jpeg';
-  quality?: number; // 0.95 - 1.0 for visually lossless
+  quality?: number; // 0.98 for visually lossless & pixel-perfect details
 }
 
 export async function compressImageLossless(
@@ -25,8 +25,8 @@ export async function compressImageLossless(
   options: CompressionOptions = {}
 ): Promise<CompressionResult> {
   const {
-    maxDimension = 2560,
-    quality = 0.95,
+    maxDimension = 3840,
+    quality = 0.98,
   } = options;
 
   const originalSize = source.size;
