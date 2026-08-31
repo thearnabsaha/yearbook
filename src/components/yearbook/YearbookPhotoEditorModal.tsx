@@ -85,7 +85,7 @@ export default function YearbookPhotoEditorModal({
     existingEntry?.captionStyle || 'snapchat'
   );
   const [showDateStamp, setShowDateStamp] = useState(existingEntry?.showDateStamp ?? true);
-  const [showDayCount, setShowDayCount] = useState(existingEntry?.showDayCount ?? true);
+  const [showDayCount, setShowDayCount] = useState(existingEntry?.showDayCount ?? false);
 
   const [aspectRatio, setAspectRatio] = useState<YearbookAspectRatio>(
     existingEntry?.aspectRatio || currentProject?.aspectRatio || '9:16'
@@ -114,7 +114,7 @@ export default function YearbookPhotoEditorModal({
             setCaptionStyle(entry.captionStyle || 'snapchat');
             setAspectRatio(entry.aspectRatio || currentProject.aspectRatio || '9:16');
             setShowDateStamp(entry.showDateStamp ?? true);
-            setShowDayCount(entry.showDayCount ?? true);
+            setShowDayCount(entry.showDayCount ?? false);
             setAlignment(entry.alignment || DEFAULT_ALIGNMENT);
             loadImageFromBlob(entry.photoBlob).then((img) => {
               if (!isCancelled) setPreviewImg(img);

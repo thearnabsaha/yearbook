@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
           captionStyle: data.captionStyle || 'snapchat',
           aspectRatio: data.aspectRatio || '9:16',
           showDateStamp: data.showDateStamp ?? true,
-          showDayCount: data.showDayCount ?? true,
+          showDayCount: data.showDayCount ?? false,
           alignment: data.alignment,
           crop: data.crop,
           filters: data.filters,
