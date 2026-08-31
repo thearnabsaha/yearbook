@@ -91,82 +91,104 @@ export default function YearbookPhotoEditorModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Load entry or initialize date
-  useEffect(() => {
-    if (!isOpen || !currentProject) return;
+  const wasOpenRef = useRef(false);
 
-    if (existingEntry) {
-      setSelectedDate(existingEntry.date);
-      setSourceBlob(existingEntry.photoBlob);
-      setCaption(existingEntry.caption || '');
-      setCaptionY(existingEntry.captionY ?? 75);
-      setCaptionStyle(existingEntry.captionStyle || 'snapchat');
-      setAspectRatio(existingEntry.aspectRatio || currentProject.aspectRatio || '9:16');
-      setShowDateStamp(existingEntry.showDateStamp ?? true);
-      setShowDayCount(existingEntry.showDayCount ?? true);
-      setAlignment(existingEntry.alignment || DEFAULT_ALIGNMENT);
-    } else if (initialDate) {
-      setSelectedDate(initialDate);
-      getYearbookEntryByDate(currentProject.id, initialDate).then((entry) => {
-        if (entry) {
-          setSourceBlob(entry.photoBlob);
-          setCaption(entry.caption || '');
-          setCaptionY(entry.captionY ?? 75);
-          setCaptionStyle(entry.captionStyle || 'snapchat');
-          setAspectRatio(entry.aspectRatio || currentProject.aspectRatio || '9:16');
-          setShowDateStamp(entry.showDateStamp ?? true);
-          setShowDayCount(entry.showDayCount ?? true);
-          setAlignment(entry.alignment || DEFAULT_ALIGNMENT);
-        } else {
-          setSourceBlob(null);
-          setCaption('');
-          setCaptionY(75);
-          setCaptionStyle('snapchat');
-          setAspectRatio(currentProject.aspectRatio || '9:16');
-          setShowDateStamp(true);
-          setShowDayCount(true);
-          setAlignment(DEFAULT_ALIGNMENT);
-        }
-      });
+  // Load entry or initialize date only on initial modal open
+  useEffect(() => {
+    if (!isOpen) {
+      wasOpenRef.current = false;
+      return;
     }
 
-    // Fetch previous day entry for onion-skinning reference
-    getPreviousDayEntry(currentProject.id, initialDate || todayStr).then((prevEntry) => {
-      if (prevEntry) {
-        loadImageFromBlob(prevEntry.photoBlob).then((gImg) => {
-          setGhostImg(gImg);
-        });
-      } else {
-        setGhostImg(null);
-      }
-    });
-  }, [existingEntry, initialDate, currentProject, isOpen, todayStr]);
+    // Only run initialization once per modal open
+    if (!wasOpenRef.current) {
+      wasOpenRef.current = true;
 
-  // Load image element from source blob & Auto-Align Eyes
+      if (existingEntry) {
+        setSelectedDate(existingEntry.date);
+        setSourceBlob(existingEntry.photoBlob);
+        setCaption(existingEntry.caption || '');
+        setCaptionY(existingEntry.captionY ?? 75);
+        setCaptionStyle(existingEntry.captionStyle || 'snapchat');
+        setAspectRatio(existingEntry.aspectRatio || currentProject?.aspectRatio || '9:16');
+        setShowDateStamp(existingEntry.showDateStamp ?? true);
+        setShowDayCount(existingEntry.showDayCount ?? true);
+        setAlignment(existingEntry.alignment || DEFAULT_ALIGNMENT);
+      } else {
+        const targetDate = initialDate || todayStr;
+        setSelectedDate(targetDate);
+        setSourceBlob(null);
+        setCaption('');
+        setCaptionY(75);
+        setCaptionStyle('snapchat');
+        setAspectRatio(currentProject?.aspectRatio || '9:16');
+        setShowDateStamp(true);
+        setShowDayCount(true);
+        setAlignment(DEFAULT_ALIGNMENT);
+
+        if (currentProject) {
+          getYearbookEntryByDate(currentProject.id, targetDate).then((entry) => {
+            if (entry) {
+              setSourceBlob(entry.photoBlob);
+              setCaption(entry.caption || '');
+              setCaptionY(entry.captionY ?? 75);
+              setCaptionStyle(entry.captionStyle || 'snapchat');
+              setAspectRatio(entry.aspectRatio || currentProject.aspectRatio || '9:16');
+              setShowDateStamp(entry.showDateStamp ?? true);
+              setShowDayCount(entry.showDayCount ?? true);
+              setAlignment(entry.alignment || DEFAULT_ALIGNMENT);
+            }
+          });
+        }
+      }
+
+      // Fetch previous day entry for onion-skinning reference
+      if (currentProject) {
+        getPreviousDayEntry(currentProject.id, initialDate || todayStr).then((prevEntry) => {
+          if (prevEntry) {
+            loadImageFromBlob(prevEntry.photoBlob).then((gImg) => {
+              setGhostImg(gImg);
+            });
+          } else {
+            setGhostImg(null);
+          }
+        });
+      }
+    }
+  }, [isOpen, existingEntry, initialDate, currentProject?.id, todayStr]);
+
+  // Load image element from source blob
   useEffect(() => {
     if (sourceBlob) {
-      loadImageFromBlob(sourceBlob).then(async (img) => {
+      loadImageFromBlob(sourceBlob).then((img) => {
         setPreviewImg(img);
-
-        // If newly added photo without explicit alignment, run auto eye-alignment
-        if (!existingEntry) {
-          setIsAutoAligning(true);
-          try {
-            const autoAligned = await detectAndAutoAlignFace(img, aspectRatio);
-            setAlignment(autoAligned);
-            setAutoAlignSuccess(true);
-            setTimeout(() => setAutoAlignSuccess(false), 2500);
-          } catch (err) {
-            console.error('Auto alignment error:', err);
-          } finally {
-            setIsAutoAligning(false);
-          }
-        }
       });
     } else {
       setPreviewImg(null);
     }
-  }, [sourceBlob, existingEntry, aspectRatio]);
+  }, [sourceBlob]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setSourceBlob(file);
+      e.target.value = '';
+
+      try {
+        const img = await loadImageFromBlob(file);
+        setPreviewImg(img);
+        setIsAutoAligning(true);
+        const autoAligned = await detectAndAutoAlignFace(img, aspectRatio);
+        setAlignment(autoAligned);
+        setAutoAlignSuccess(true);
+        setTimeout(() => setAutoAlignSuccess(false), 2500);
+      } catch (err) {
+        console.error('Auto alignment error on upload:', err);
+      } finally {
+        setIsAutoAligning(false);
+      }
+    }
+  };
 
   const handleManualAutoAlign = async () => {
     if (!previewImg) return;
@@ -180,14 +202,6 @@ export default function YearbookPhotoEditorModal({
       console.error('Auto align error:', err);
     } finally {
       setIsAutoAligning(false);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setSourceBlob(file);
-      e.target.value = '';
     }
   };
 
