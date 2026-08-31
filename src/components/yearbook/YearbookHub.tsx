@@ -102,13 +102,6 @@ function YearbookDayCard({
           </span>
         </div>
 
-        {/* Caption snippet overlay */}
-        {entry.caption && (
-          <div className="absolute bottom-2 left-2 right-2 rounded-lg bg-black/75 p-1.5 backdrop-blur-xs text-[10px] text-white truncate">
-            {entry.caption}
-          </div>
-        )}
-
         {/* Hover Quick Actions */}
         <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-black/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100">
           <button
