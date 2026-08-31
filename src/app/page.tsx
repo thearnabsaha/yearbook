@@ -48,21 +48,19 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-[#e7e1d3] bg-white py-6 text-center text-xs text-[#78716c]">
-        <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="font-serif-editorial font-bold text-[#1c1917]">Yearbook PWA</span>
+        <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center justify-center gap-2">
+            <span className="font-serif-editorial font-bold text-[#1c1917]">Yearbook</span>
             <span>•</span>
-            <span className="text-[#c27838] font-medium">Offline-First & MongoDB Cloud Synced</span>
+            <span className="text-[#78716c]">Daily Photo Growth Studio</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center gap-4">
             <button
               onClick={() => setCurrentView('landing')}
-              className="text-[#c27838] hover:underline font-semibold cursor-pointer"
+              className="text-[#c27838] hover:underline font-medium cursor-pointer"
             >
-              Landing Page Overview
+              Landing Page
             </button>
-            <span>•</span>
-            <span>Private, local-first storage with automatic MongoDB Atlas sync</span>
           </div>
         </div>
       </footer>
