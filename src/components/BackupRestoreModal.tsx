@@ -204,15 +204,31 @@ export default function BackupRestoreModal({
                   MongoDB Multi-Device Sync
                 </span>
               </div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 border border-emerald-200">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                {syncStatus?.connected ? 'Cloud Connected' : 'Checking...'}
-              </span>
+              {syncStatus?.connected ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 border border-emerald-200">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Cloud Connected
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-800 border border-amber-200">
+                  <AlertTriangle className="h-3 w-3 text-amber-600" />
+                  Cloud Inactive
+                </span>
+              )}
             </div>
 
             <p className="text-xs text-[#78716c] leading-relaxed">
               Photos uploaded on your phone or laptop sync through MongoDB Atlas so you can view, edit, and export your timelapses anywhere.
             </p>
+
+            {syncStatus && !syncStatus.connected && (
+              <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900 space-y-1">
+                <p className="font-semibold">⚠️ Cloud Sync Setup Needed on Vercel</p>
+                <p className="text-[11px] text-amber-800">
+                  Add <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">MONGODB_URI</code> to your Vercel Project Settings → Environment Variables to enable seamless synchronization between phone and laptop.
+                </p>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-2 pt-1">
               <button
