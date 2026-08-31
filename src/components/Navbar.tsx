@@ -41,8 +41,8 @@ export default function Navbar({
               className="h-full w-full object-cover"
             />
           </div>
-          <span className="font-serif-editorial text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
-            Year<span className="text-[#c27838] italic">book</span>
+          <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
+            Year<span className="text-[#c27838]">book</span>
           </span>
         </button>
 

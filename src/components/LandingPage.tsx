@@ -125,11 +125,11 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-serif-editorial text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
-                  Year<span className="text-[#c27838] italic">book</span>
+                <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
+                  Year<span className="text-[#c27838]">book</span>
                 </span>
                 <span className="hidden sm:inline-flex rounded-full bg-[#f5f1e8] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#c27838] border border-[#e7e1d3]">
-                  Vol. I • Studio PWA
+                  Daily Studio
                 </span>
               </div>
             </div>
@@ -725,8 +725,8 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
                 className="h-full w-full object-cover"
               />
             </div>
-            <span className="font-serif-editorial text-base font-bold text-[#1c1917]">
-              Year<span className="text-[#c27838] italic">book</span>
+            <span className="font-display text-base font-bold text-[#1c1917]">
+              Year<span className="text-[#c27838]">book</span>
             </span>
             <span>•</span>
             <span className="text-[#c27838] font-medium">Daily Photo Growth Atelier</span>
