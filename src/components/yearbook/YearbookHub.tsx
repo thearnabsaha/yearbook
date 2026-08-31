@@ -419,30 +419,30 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
           </div>
 
           {/* Streak Stats */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-3 rounded-2xl border border-[#e7e1d3] bg-white p-3.5 px-4 shadow-xs">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-200">
-                <Flame className="h-5 w-5 fill-amber-500 text-amber-500" />
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 rounded-2xl border border-[#e7e1d3] bg-white p-3 sm:p-3.5 shadow-xs">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-200 shrink-0">
+                <Flame className="h-4 w-4 sm:h-5 sm:w-5 fill-amber-500 text-amber-500" />
               </div>
-              <div>
-                <p className="text-[11px] text-[#78716c] uppercase tracking-wider font-semibold">
-                  Daily Streak
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-[11px] text-[#78716c] uppercase tracking-wider font-semibold truncate">
+                  Streak
                 </p>
-                <p className="font-display text-lg font-bold text-[#1c1917]">
+                <p className="text-base sm:text-lg font-bold text-[#1c1917] truncate">
                   {stats.streak} {stats.streak === 1 ? 'Day' : 'Days'}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 rounded-2xl border border-[#e7e1d3] bg-white p-3.5 px-4 shadow-xs">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f5f1e8] text-[#c27838] border border-[#e7e1d3]">
-                <CalendarIcon className="h-5 w-5" />
+            <div className="flex items-center gap-2.5 sm:gap-3 rounded-2xl border border-[#e7e1d3] bg-white p-3 sm:p-3.5 shadow-xs">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[#f5f1e8] text-[#c27838] border border-[#e7e1d3] shrink-0">
+                <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div>
-                <p className="text-[11px] text-[#78716c] uppercase tracking-wider font-semibold">
-                  Logged Entries
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-[11px] text-[#78716c] uppercase tracking-wider font-semibold truncate">
+                  Entries
                 </p>
-                <p className="font-display text-lg font-bold text-[#1c1917]">
+                <p className="text-base sm:text-lg font-bold text-[#1c1917] truncate">
                   {stats.totalDays} Total
                 </p>
               </div>
@@ -563,23 +563,23 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
 
       {/* 4. Chronological Daily Entries Timeline Stream */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h3 className="font-display text-base sm:text-lg font-bold text-[#1c1917]">
-              Daily Photo Timeline ({activeProject?.title})
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <h3 className="font-display text-base sm:text-lg font-bold text-[#1c1917] truncate">
+              Timeline • {activeProject?.title}
             </h3>
-            <span className="rounded-full bg-[#f5f1e8] px-2.5 py-0.5 text-xs font-semibold text-[#1c1917] border border-[#e7e1d3]">
-              {entries.length} Days
+            <span className="shrink-0 rounded-lg bg-[#f5f1e8] px-2.5 py-0.5 text-xs font-bold text-[#78716c] border border-[#e7e1d3] whitespace-nowrap">
+              {entries.length} {entries.length === 1 ? 'Day' : 'Days'}
             </span>
           </div>
 
           {entries.length > 0 && (
             <button
               onClick={() => setIsTimelapseOpen(true)}
-              className="flex items-center gap-1.5 text-xs font-semibold text-[#c27838] hover:text-[#a85d26] cursor-pointer"
+              className="self-start sm:self-auto flex items-center gap-1.5 rounded-xl bg-[#292524] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1c1917] transition-all cursor-pointer shrink-0"
             >
-              <Play className="h-3.5 w-3.5 fill-[#c27838]" />
-              <span>Watch Video Timelapse</span>
+              <Play className="h-3.5 w-3.5 fill-white" />
+              <span>Watch Timelapse</span>
             </button>
           )}
         </div>
