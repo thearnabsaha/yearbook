@@ -15,10 +15,9 @@ export async function GET() {
     }
 
     const { db } = await connectToDatabase();
-    const [projectCount, entryCount, photoCount] = await Promise.all([
+    const [projectCount, entryCount] = await Promise.all([
       db.collection('yearbook_projects').countDocuments(),
       db.collection('yearbook_entries').countDocuments(),
-      db.collection('photos').countDocuments(),
     ]);
 
     return NextResponse.json({
@@ -27,7 +26,6 @@ export async function GET() {
       stats: {
         projects: projectCount,
         yearbookEntries: entryCount,
-        photos: photoCount,
       },
     });
   } catch (err: any) {

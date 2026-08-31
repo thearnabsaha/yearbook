@@ -1,5 +1,5 @@
 import { db } from './db';
-import { YearbookProject, YearbookEntry, PhotoRecord } from './types';
+import { YearbookProject, YearbookEntry } from './types';
 
 // Convert Blob to Base64 data URL
 export function blobToBase64(blob: Blob): Promise<string> {
@@ -24,7 +24,6 @@ export interface SyncStatus {
   stats?: {
     projects: number;
     yearbookEntries: number;
-    photos: number;
   };
 }
 
@@ -123,53 +122,16 @@ export async function deleteYearbookEntryFromCloud(id: string): Promise<void> {
   }
 }
 
-// Sync Photo to Cloud
-export async function syncPhotoToCloud(photo: PhotoRecord): Promise<void> {
-  try {
-    const [originalBase64, thumbnailBase64, editedBase64] = await Promise.all([
-      blobToBase64(photo.originalBlob),
-      blobToBase64(photo.thumbnailBlob),
-      photo.editedBlob ? blobToBase64(photo.editedBlob) : Promise.resolve(undefined),
-    ]);
-
-    await fetch('/api/photos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...photo,
-        originalBase64,
-        thumbnailBase64,
-        editedBase64,
-      }),
-    });
-  } catch (err) {
-    console.warn('Background cloud sync warning (photo):', err);
-  }
-}
-
-// Delete Photo from Cloud
-export async function deletePhotoFromCloud(id: string): Promise<void> {
-  try {
-    await fetch(`/api/photos?id=${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-    });
-  } catch (err) {
-    console.warn('Background cloud delete warning (photo):', err);
-  }
-}
-
 // Pull all data from MongoDB Atlas to local IndexedDB
 export async function pullAllFromCloud(): Promise<{
   syncedProjects: number;
   syncedYearbook: number;
-  syncedPhotos: number;
 }> {
   currentSyncStatus.isSyncing = true;
   notifyStatusChange();
 
   let syncedProjects = 0;
   let syncedYearbook = 0;
-  let syncedPhotos = 0;
 
   try {
     // 1. Pull Projects
@@ -205,30 +167,6 @@ export async function pullAllFromCloud(): Promise<{
       }
     }
 
-    // 3. Pull Photos
-    const phRes = await fetch('/api/photos');
-    const phData = await phRes.json();
-    if (phData.success && Array.isArray(phData.photos)) {
-      for (const ph of phData.photos) {
-        const { _id, originalBase64, thumbnailBase64, editedBase64, ...photoMeta } = ph;
-        if (originalBase64 && thumbnailBase64) {
-          const [originalBlob, thumbnailBlob, editedBlob] = await Promise.all([
-            base64ToBlob(originalBase64),
-            base64ToBlob(thumbnailBase64),
-            editedBase64 ? base64ToBlob(editedBase64) : Promise.resolve(undefined),
-          ]);
-
-          await db.photos.put({
-            ...photoMeta,
-            originalBlob,
-            thumbnailBlob,
-            editedBlob,
-          });
-          syncedPhotos++;
-        }
-      }
-    }
-
     currentSyncStatus.lastSyncedAt = Date.now();
     currentSyncStatus.connected = true;
   } catch (err: any) {
@@ -239,7 +177,7 @@ export async function pullAllFromCloud(): Promise<{
     notifyStatusChange();
   }
 
-  return { syncedProjects, syncedYearbook, syncedPhotos };
+  return { syncedProjects, syncedYearbook };
 }
 
 // Push all local IndexedDB data to MongoDB Atlas
@@ -248,10 +186,9 @@ export async function pushAllToCloud(): Promise<void> {
   notifyStatusChange();
 
   try {
-    const [projects, entries, photos] = await Promise.all([
+    const [projects, entries] = await Promise.all([
       db.yearbookProjects.toArray(),
       db.yearbook.toArray(),
-      db.photos.toArray(),
     ]);
 
     for (const p of projects) {
@@ -260,10 +197,6 @@ export async function pushAllToCloud(): Promise<void> {
 
     for (const e of entries) {
       await syncYearbookEntryToCloud(e);
-    }
-
-    for (const ph of photos) {
-      await syncPhotoToCloud(ph);
     }
 
     currentSyncStatus.lastSyncedAt = Date.now();

@@ -42,7 +42,7 @@ import {
 } from '@/lib/cloud-sync';
 
 interface YearbookHubProps {
-  onOpenVault: () => void;
+  className?: string;
 }
 
 // Single Day Card in the Timeline
@@ -146,7 +146,7 @@ function YearbookDayCard({
   );
 }
 
-export default function YearbookHub({ onOpenVault }: YearbookHubProps) {
+export default function YearbookHub({ className }: YearbookHubProps = {}) {
   const projects = useLiveQuery(() => db.yearbookProjects.toArray(), []) || [];
   const [activeProjectId, setActiveProjectId] = useState<string>('yb_main');
 
