@@ -1,10 +1,22 @@
 import { MongoClient, Db } from 'mongodb';
 
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB || 'pixelforge';
+export function getMongoUri(): string | undefined {
+  return (
+    process.env.YearBook_MONGODB_URI ||
+    process.env.YEARBOOK_MONGODB_URI ||
+    process.env.MONGODB_URI ||
+    process.env.MONGO_URI ||
+    process.env.DATABASE_URL
+  );
+}
 
-if (!uri) {
-  console.warn('⚠️ MONGODB_URI is not defined in environment variables. Local fallback will be used.');
+export function getDbName(): string {
+  return (
+    process.env.MONGODB_DB ||
+    process.env.YearBook_MONGODB_DB ||
+    process.env.YEARBOOK_MONGODB_DB ||
+    'yearbook'
+  );
 }
 
 const options = {
@@ -13,37 +25,36 @@ const options = {
   socketTimeoutMS: 45000,
 };
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
-
 declare global {
   // eslint-disable-next-line no-var
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-if (!uri) {
-  // Safe mock promise when URI is absent during local development/build
-  clientPromise = Promise.reject(new Error('MONGODB_URI not provided'));
-} else {
+export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
+  const uri = getMongoUri();
+  const dbName = getDbName();
+
+  if (!uri) {
+    throw new Error(
+      'Please configure MONGODB_URI or YearBook_MONGODB_URI in your Vercel Environment Variables.'
+    );
+  }
+
+  let clientPromise: Promise<MongoClient>;
+
   if (process.env.NODE_ENV === 'development') {
-    // In development mode, use a global variable so that the value
-    // is preserved across module reloads caused by HMR (Hot Module Replacement).
     if (!global._mongoClientPromise) {
-      client = new MongoClient(uri, options);
+      const client = new MongoClient(uri, options);
       global._mongoClientPromise = client.connect();
     }
     clientPromise = global._mongoClientPromise;
   } else {
-    // In production / Vercel Serverless mode, create a new client promise
-    // that is cached per serverless container lifecycle.
-    client = new MongoClient(uri, options);
-    clientPromise = client.connect();
-  }
-}
-
-export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
-  if (!uri) {
-    throw new Error('Please configure MONGODB_URI in your Vercel Environment Variables.');
+    // In production / Vercel Serverless mode
+    if (!global._mongoClientPromise) {
+      const client = new MongoClient(uri, options);
+      global._mongoClientPromise = client.connect();
+    }
+    clientPromise = global._mongoClientPromise;
   }
 
   const activeClient = await clientPromise;
@@ -51,4 +62,4 @@ export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db
   return { client: activeClient, db };
 }
 
-export default clientPromise;
+export default connectToDatabase;

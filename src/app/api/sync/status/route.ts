@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
+import { connectToDatabase, getMongoUri } from '@/lib/mongodb';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -7,10 +7,11 @@ export const maxDuration = 30;
 
 export async function GET() {
   try {
-    if (!process.env.MONGODB_URI) {
+    const uri = getMongoUri();
+    if (!uri) {
       return NextResponse.json({
         connected: false,
-        message: 'MONGODB_URI is not configured in Vercel Environment Variables.',
+        message: 'MONGODB_URI or YearBook_MONGODB_URI is not configured in Vercel Environment Variables.',
       });
     }
 
