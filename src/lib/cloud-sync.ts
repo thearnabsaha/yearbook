@@ -74,7 +74,7 @@ export async function syncYearbookProjectToCloud(project: YearbookProject): Prom
       body: JSON.stringify(project),
     });
   } catch (err) {
-    console.warn('Background cloud sync warning (yearbook project):', err);
+    console.warn('Cloud sync project notice:', err);
   }
 }
 
@@ -85,7 +85,7 @@ export async function deleteYearbookProjectFromCloud(id: string): Promise<void> 
       method: 'DELETE',
     });
   } catch (err) {
-    console.warn('Background cloud delete warning (yearbook project):', err);
+    console.warn('Cloud delete project notice:', err);
   }
 }
 
@@ -93,14 +93,13 @@ export async function deleteYearbookProjectFromCloud(id: string): Promise<void> 
 export async function syncYearbookEntryToCloud(entry: YearbookEntry): Promise<boolean> {
   try {
     let photoToSend = entry.photoBlob;
-    // Keep cloud payload ultra fast & safely below Vercel serverless bounds
     if (photoToSend.size > 1500 * 1024) {
       try {
         const { compressImageLossless } = await import('./compression');
         const comp = await compressImageLossless(photoToSend, { maxDimension: 2048, quality: 0.92 });
         photoToSend = comp.compressedBlob;
       } catch {
-        // Fallback to original
+        // Fallback
       }
     }
 
@@ -128,7 +127,7 @@ export async function syncYearbookEntryToCloud(entry: YearbookEntry): Promise<bo
     }
     return false;
   } catch (err) {
-    console.warn('Background cloud sync warning (yearbook entry):', err);
+    console.warn('Cloud sync entry notice:', err);
     return false;
   }
 }
@@ -140,7 +139,7 @@ export async function deleteYearbookEntryFromCloud(id: string): Promise<void> {
       method: 'DELETE',
     });
   } catch (err) {
-    console.warn('Background cloud delete warning (yearbook entry):', err);
+    console.warn('Cloud delete entry notice:', err);
   }
 }
 
@@ -189,7 +188,7 @@ export async function pullAllFromCloud(): Promise<{
     currentSyncStatus.lastSyncedAt = Date.now();
     currentSyncStatus.connected = true;
   } catch (err: any) {
-    console.error('Pull all from cloud error:', err);
+    console.error('Pull all from cloud notice:', err);
     currentSyncStatus.error = err.message;
   }
 
@@ -217,62 +216,4 @@ export async function pushAllToCloud(): Promise<void> {
   } catch (err: any) {
     console.error('Push all to cloud error:', err);
   }
-}
-
-let isPerformingFullSync = false;
-
-// Seamless Automatic Bidirectional Sync
-export async function fullBidirectionalSync(): Promise<void> {
-  if (isPerformingFullSync) return;
-  isPerformingFullSync = true;
-  currentSyncStatus.isSyncing = true;
-  notifyStatusChange();
-
-  try {
-    // 1. Check cloud health
-    const isConnected = await checkCloudConnectionStatus();
-    if (!isConnected) return;
-
-    // 2. Push any local photos that might have been taken offline
-    await pushAllToCloud();
-
-    // 3. Pull latest photos & projects from other devices
-    await pullAllFromCloud();
-  } catch (err: any) {
-    console.warn('Seamless background sync error:', err);
-  } finally {
-    isPerformingFullSync = false;
-    currentSyncStatus.isSyncing = false;
-    notifyStatusChange();
-  }
-}
-
-// Automatic background triggers
-if (typeof window !== 'undefined') {
-  // Trigger on initial page boot
-  setTimeout(() => {
-    fullBidirectionalSync();
-  }, 500);
-
-  // Trigger when switching back to tab or unlocking device
-  window.addEventListener('focus', () => {
-    fullBidirectionalSync();
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      fullBidirectionalSync();
-    }
-  });
-
-  window.addEventListener('online', () => {
-    fullBidirectionalSync();
-  });
-
-  // Background interval polling every 12 seconds
-  setInterval(() => {
-    if (document.visibilityState === 'visible') {
-      fullBidirectionalSync();
-    }
-  }, 12000);
 }

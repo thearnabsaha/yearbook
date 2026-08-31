@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { Database, RefreshCw } from 'lucide-react';
 import {
-  fullBidirectionalSync,
+  checkCloudConnectionStatus,
+  pullAllFromCloud,
   subscribeToSyncStatus,
   SyncStatus,
 } from '@/lib/cloud-sync';
@@ -25,7 +26,8 @@ export default function Navbar({
     const unsub = subscribeToSyncStatus((status) => {
       setSyncStatus(status);
     });
-    fullBidirectionalSync();
+    checkCloudConnectionStatus();
+    pullAllFromCloud();
     return unsub;
   }, []);
 
