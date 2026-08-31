@@ -556,9 +556,14 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
             <p className="text-xs sm:text-sm text-[#78716c] leading-relaxed max-w-xl mb-6">
               No manual nudge or guesswork required. The integrated computer vision engine instantly locates ocular coordinates, centers the face horizontally at 50%, and anchors eye level at 38% height for butter-smooth morphing.
             </p>
-            <div className="rounded-2xl bg-[#1c1917] p-4 text-xs font-mono text-[#c27838] flex items-center justify-between border border-stone-800">
-              <span>Target: Center [50.0% X] • Eye-Anchor [38.0% Y]</span>
-              <span className="text-emerald-400 font-bold">✓ AUTO LOCKED</span>
+            <div className="rounded-2xl bg-[#1c1917] p-3.5 sm:p-4 text-xs font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-stone-800">
+              <div className="flex items-center gap-2 text-[#c27838] min-w-0">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="text-[11px] sm:text-xs">Eye Level: 38% Y • Center: 50% X</span>
+              </div>
+              <span className="inline-flex items-center self-start sm:self-auto rounded-md bg-emerald-500/15 px-2.5 py-1 text-[10px] font-bold text-emerald-400 shrink-0">
+                ✓ AUTO LOCKED
+              </span>
             </div>
           </div>
 
