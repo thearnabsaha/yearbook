@@ -40,7 +40,7 @@ import {
 import { loadImageFromBlob } from '@/lib/canvas-utils';
 import { detectAndAutoAlignFace } from '@/lib/face-align';
 import { getLocalTodayString, formatDisplayDate } from '@/lib/date-utils';
-import { syncYearbookEntryToCloud } from '@/lib/cloud-sync';
+import { syncYearbookEntryToCloud, syncYearbookProjectToCloud } from '@/lib/cloud-sync';
 
 interface YearbookPhotoEditorModalProps {
   isOpen: boolean;
@@ -417,7 +417,10 @@ export default function YearbookPhotoEditorModal({
           });
 
           onEntrySaved(record);
-          syncYearbookEntryToCloud(record);
+          if (currentProject) {
+            syncYearbookProjectToCloud(currentProject);
+          }
+          await syncYearbookEntryToCloud(record);
           setIsSaving(false);
           onClose();
         },

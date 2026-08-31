@@ -90,14 +90,14 @@ export async function deleteYearbookProjectFromCloud(id: string): Promise<void> 
 }
 
 // Sync single Yearbook Entry to Cloud
-export async function syncYearbookEntryToCloud(entry: YearbookEntry): Promise<void> {
+export async function syncYearbookEntryToCloud(entry: YearbookEntry): Promise<boolean> {
   try {
     const [photoBase64, thumbnailBase64] = await Promise.all([
       blobToBase64(entry.photoBlob),
       blobToBase64(entry.thumbnailBlob),
     ]);
 
-    await fetch('/api/yearbook-entries', {
+    const res = await fetch('/api/yearbook-entries', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -106,8 +106,18 @@ export async function syncYearbookEntryToCloud(entry: YearbookEntry): Promise<vo
         thumbnailBase64,
       }),
     });
+
+    const data = await res.json();
+    if (data.success) {
+      currentSyncStatus.lastSyncedAt = Date.now();
+      currentSyncStatus.connected = true;
+      notifyStatusChange();
+      return true;
+    }
+    return false;
   } catch (err) {
     console.warn('Background cloud sync warning (yearbook entry):', err);
+    return false;
   }
 }
 
@@ -120,6 +130,18 @@ export async function deleteYearbookEntryFromCloud(id: string): Promise<void> {
   } catch (err) {
     console.warn('Background cloud delete warning (yearbook entry):', err);
   }
+}
+
+// Auto-sync on window focus or visibility change
+if (typeof window !== 'undefined') {
+  window.addEventListener('focus', () => {
+    pullAllFromCloud();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      pullAllFromCloud();
+    }
+  });
 }
 
 // Pull all data from MongoDB Atlas to local IndexedDB

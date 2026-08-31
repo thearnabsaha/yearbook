@@ -11,8 +11,11 @@ import {
   CheckCircle2,
   AlertTriangle,
   Loader2,
-  ShieldCheck,
   RefreshCw,
+  Cloud,
+  CloudDownload,
+  CloudUpload,
+  Check,
 } from 'lucide-react';
 import {
   getStorageQuotaInfo,
@@ -21,6 +24,13 @@ import {
   db,
 } from '@/lib/db';
 import { StorageQuotaInfo } from '@/lib/types';
+import {
+  checkCloudConnectionStatus,
+  pullAllFromCloud,
+  pushAllToCloud,
+  subscribeToSyncStatus,
+  SyncStatus,
+} from '@/lib/cloud-sync';
 import confetti from 'canvas-confetti';
 
 interface BackupRestoreModalProps {
@@ -35,6 +45,11 @@ export default function BackupRestoreModal({
   onDataChanged,
 }: BackupRestoreModalProps) {
   const [storageInfo, setStorageInfo] = useState<StorageQuotaInfo | null>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
+  const [isPulling, setIsPulling] = useState(false);
+  const [isPushing, setIsPushing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importStatus, setImportStatus] = useState<string | null>(null);
@@ -47,23 +62,61 @@ export default function BackupRestoreModal({
   };
 
   useEffect(() => {
+    const unsub = subscribeToSyncStatus((status) => {
+      setSyncStatus(status);
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       loadStorage();
+      checkCloudConnectionStatus();
       setImportStatus(null);
+      setSyncMessage(null);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
+  const handlePullFromCloud = async () => {
+    setIsPulling(true);
+    setSyncMessage('Fetching latest photos and projects from MongoDB Cloud...');
+    try {
+      const result = await pullAllFromCloud();
+      setSyncMessage(
+        `✓ Synced! Fetched ${result.syncedYearbook} photos and ${result.syncedProjects} projects from cloud.`
+      );
+      await loadStorage();
+      onDataChanged();
+      confetti({ particleCount: 40, spread: 60 });
+    } catch (err: any) {
+      setSyncMessage(`Error syncing from cloud: ${err.message}`);
+    } finally {
+      setIsPulling(false);
+    }
+  };
+
+  const handlePushToCloud = async () => {
+    setIsPushing(true);
+    setSyncMessage('Uploading all local photos to MongoDB Atlas Cloud...');
+    try {
+      await pushAllToCloud();
+      await checkCloudConnectionStatus();
+      setSyncMessage('✓ Successfully backed up all photos to MongoDB Atlas!');
+      confetti({ particleCount: 40, spread: 60 });
+    } catch (err: any) {
+      setSyncMessage(`Error uploading to cloud: ${err.message}`);
+    } finally {
+      setIsPushing(false);
+    }
+  };
+
   const handleExportBackup = async () => {
     setIsExporting(true);
     try {
       await exportDatabaseBackup();
-      confetti({
-        particleCount: 50,
-        spread: 50,
-        origin: { y: 0.6 },
-      });
+      confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 } });
     } catch (err) {
       console.error('Backup export failed:', err);
       alert('Failed to generate backup ZIP');
@@ -80,14 +133,12 @@ export default function BackupRestoreModal({
     setImportStatus('Restoring photos and metadata from ZIP archive...');
 
     try {
-      const { restoredPhotos, restoredAlbums } = await importDatabaseBackup(file);
+      const { restoredPhotos, restoredAlbums, restoredYearbook } =
+        await importDatabaseBackup(file);
       setImportStatus(
-        `Successfully restored ${restoredPhotos} photos and ${restoredAlbums} albums!`
+        `Successfully restored ${restoredYearbook || restoredPhotos} photos and projects!`
       );
-      confetti({
-        particleCount: 80,
-        spread: 70,
-      });
+      confetti({ particleCount: 80, spread: 70 });
       await loadStorage();
       onDataChanged();
     } catch (err: unknown) {
@@ -102,13 +153,13 @@ export default function BackupRestoreModal({
 
   const handleClearDatabase = async () => {
     const answer = prompt(
-      'WARNING: This will permanently delete all locally stored photos, edits, and captions. Type "DELETE" to confirm:'
+      'WARNING: This will delete local photos on this browser. Type "DELETE" to confirm:'
     );
 
     if (answer === 'DELETE') {
       setIsClearing(true);
-      await db.photos.clear();
-      await db.albums.clear();
+      await db.yearbook.clear();
+      await db.yearbookProjects.clear();
       await loadStorage();
       onDataChanged();
       setIsClearing(false);
@@ -117,70 +168,123 @@ export default function BackupRestoreModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 animate-in fade-in duration-200">
-      <div className="relative flex flex-col w-full max-w-lg overflow-hidden rounded-3xl border border-slate-800 bg-[#0d101a] shadow-2xl shadow-indigo-950/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
+      <div className="relative flex flex-col w-full max-w-lg overflow-hidden rounded-3xl border border-[#e7e1d3] bg-[#fbf9f5] shadow-2xl shadow-stone-900/15 max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800/80 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-[#e7e1d3] px-6 py-4 bg-white">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f5f1e8] text-[#c27838] border border-[#e7e1d3]">
               <Database className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-display text-sm sm:text-base font-bold text-white">
-                Local Vault & Backup Hub
+              <h3 className="font-display text-base font-bold text-[#1c1917]">
+                Multi-Device Cloud & Vault
               </h3>
-              <p className="text-[11px] text-slate-400">
-                100% Client-Side Privacy & Database Management
+              <p className="text-xs text-[#78716c]">
+                Sync between Phone & Laptop or export offline archives
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+            className="rounded-xl p-2 text-[#78716c] hover:bg-[#f5f1e8] hover:text-[#1c1917] transition-colors cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="space-y-6 p-6 text-xs sm:text-sm">
-          {/* Storage Quota Card */}
-          <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 p-4 space-y-3">
+        <div className="space-y-6 p-6 overflow-y-auto text-xs sm:text-sm">
+          {/* MongoDB Atlas Multi-Device Cloud Sync Card */}
+          <div className="rounded-2xl border border-[#c27838]/30 bg-white p-4 space-y-3 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-slate-300">
-                <HardDrive className="h-4 w-4 text-indigo-400" />
-                <span className="font-semibold text-xs uppercase tracking-wider">
-                  IndexedDB Storage
+              <div className="flex items-center gap-2 text-[#1c1917]">
+                <Cloud className="h-4 w-4 text-[#c27838]" />
+                <span className="font-bold text-xs uppercase tracking-wider">
+                  MongoDB Multi-Device Sync
                 </span>
               </div>
-              <span className="font-mono text-xs text-indigo-300 font-medium">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 border border-emerald-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {syncStatus?.connected ? 'Cloud Connected' : 'Checking...'}
+              </span>
+            </div>
+
+            <p className="text-xs text-[#78716c] leading-relaxed">
+              Photos uploaded on your phone or laptop sync through MongoDB Atlas so you can view, edit, and export your timelapses anywhere.
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                disabled={isPulling}
+                onClick={handlePullFromCloud}
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#c27838] px-3 py-2.5 text-xs font-semibold text-white hover:bg-[#a85d26] transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              >
+                {isPulling ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <CloudDownload className="h-3.5 w-3.5" />
+                )}
+                <span>Pull from Cloud</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={isPushing}
+                onClick={handlePushToCloud}
+                className="flex items-center justify-center gap-2 rounded-xl border border-[#e7e1d3] bg-[#fbf9f5] px-3 py-2.5 text-xs font-semibold text-[#1c1917] hover:bg-[#f5f1e8] hover:border-[#c27838] transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isPushing ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <CloudUpload className="h-3.5 w-3.5 text-[#c27838]" />
+                )}
+                <span>Push to Cloud</span>
+              </button>
+            </div>
+
+            {syncMessage && (
+              <div className="rounded-xl bg-[#f5f1e8] border border-[#e7e1d3] p-2.5 text-xs font-medium text-[#1c1917]">
+                {syncMessage}
+              </div>
+            )}
+          </div>
+
+          {/* Storage Quota Card */}
+          <div className="rounded-2xl border border-[#e7e1d3] bg-white p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[#1c1917]">
+                <HardDrive className="h-4 w-4 text-[#c27838]" />
+                <span className="font-semibold text-xs uppercase tracking-wider">
+                  Device Local Storage
+                </span>
+              </div>
+              <span className="font-mono text-xs text-[#c27838] font-bold">
                 {storageInfo?.usageFormatted || '0 B'} used
               </span>
             </div>
 
             {/* Storage bar */}
-            <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-[#f5f1e8] overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-300"
+                className="h-full bg-gradient-to-r from-[#c27838] to-[#e69b5c] rounded-full transition-all duration-300"
                 style={{ width: `${Math.max(1, storageInfo?.percentUsed || 1)}%` }}
               />
             </div>
-
-            <p className="text-[11px] text-slate-400">
-              Your photos and edit histories are encrypted and held locally on your device in browser storage.
-            </p>
           </div>
 
-          {/* Export Full Backup */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Export Archive
+          {/* Offline ZIP Backup & Restore */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#78716c]">
+              Offline ZIP Archives
             </h4>
-            <div className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/30 p-3.5">
+
+            <div className="flex items-center justify-between rounded-2xl border border-[#e7e1d3] bg-white p-3.5">
               <div>
-                <p className="text-xs font-semibold text-white">Full Vault Backup (.ZIP)</p>
-                <p className="text-[11px] text-slate-400">
-                  Includes all full-res photos, edits, tags, and JSON metadata.
+                <p className="text-xs font-semibold text-[#1c1917]">Export Full Archive (.ZIP)</p>
+                <p className="text-[11px] text-[#78716c]">
+                  All full-res photos, crop alignment, and metadata.
                 </p>
               </div>
 
@@ -188,73 +292,68 @@ export default function BackupRestoreModal({
                 type="button"
                 disabled={isExporting}
                 onClick={handleExportBackup}
-                className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/30 cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-[#fbf9f5] px-3.5 py-2 text-xs font-semibold text-[#1c1917] hover:bg-[#f5f1e8] hover:border-[#c27838] transition-all cursor-pointer disabled:opacity-50"
               >
                 {isExporting ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <Download className="h-3.5 w-3.5" />
+                  <Download className="h-3.5 w-3.5 text-[#c27838]" />
                 )}
-                <span>{isExporting ? 'Packaging...' : 'Export ZIP'}</span>
+                <span>{isExporting ? 'Exporting...' : 'Export ZIP'}</span>
               </button>
             </div>
-          </div>
 
-          {/* Import Restore */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Restore Archive
-            </h4>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".zip"
-              onChange={handleFileSelected}
-              className="hidden"
-            />
-            <div className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/30 p-3.5">
+            <div className="flex items-center justify-between rounded-2xl border border-[#e7e1d3] bg-white p-3.5">
               <div>
-                <p className="text-xs font-semibold text-white">Import Backup (.ZIP)</p>
-                <p className="text-[11px] text-slate-400">
-                  Restore previous backups or sync collections from another device.
+                <p className="text-xs font-semibold text-[#1c1917]">Restore Backup (.ZIP)</p>
+                <p className="text-[11px] text-[#78716c]">
+                  Restore collections from an archive file.
                 </p>
               </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".zip"
+                onChange={handleFileSelected}
+                className="hidden"
+              />
 
               <button
                 type="button"
                 disabled={isImporting}
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-[#fbf9f5] px-3.5 py-2 text-xs font-semibold text-[#1c1917] hover:bg-[#f5f1e8] hover:border-[#c27838] transition-all cursor-pointer disabled:opacity-50"
               >
                 {isImporting ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <Upload className="h-3.5 w-3.5 text-emerald-400" />
+                  <Upload className="h-3.5 w-3.5 text-[#c27838]" />
                 )}
-                <span>{isImporting ? 'Importing...' : 'Select ZIP'}</span>
+                <span>{isImporting ? 'Restoring...' : 'Select ZIP'}</span>
               </button>
             </div>
 
             {importStatus && (
-              <p className="text-xs text-indigo-300 font-medium bg-indigo-950/40 p-2.5 rounded-xl border border-indigo-500/30 animate-in fade-in">
+              <p className="text-xs text-[#c27838] font-semibold bg-[#f5f1e8] p-2.5 rounded-xl border border-[#e7e1d3] animate-in fade-in">
                 {importStatus}
               </p>
             )}
           </div>
 
           {/* Wipe Vault Clean */}
-          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
-            <div className="text-[11px] text-slate-500">
-              Need to free up browser disk space?
+          <div className="pt-2 border-t border-[#e7e1d3] flex items-center justify-between">
+            <div className="text-[11px] text-[#78716c]">
+              Need to clear this browser&apos;s cache?
             </div>
             <button
               type="button"
               disabled={isClearing}
               onClick={handleClearDatabase}
-              className="flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition-colors cursor-pointer"
             >
               <Trash2 className="h-3.5 w-3.5" />
-              <span>Wipe Local Vault</span>
+              <span>Clear Local Data</span>
             </button>
           </div>
         </div>
