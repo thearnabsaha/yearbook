@@ -7,7 +7,6 @@ import { PhotoRecord } from '@/lib/types';
 import Navbar, { AppSection } from '@/components/Navbar';
 import PhotoDropzone from '@/components/PhotoDropzone';
 import GalleryGrid from '@/components/GalleryGrid';
-import CameraCaptureModal from '@/components/CameraCaptureModal';
 import BackupRestoreModal from '@/components/BackupRestoreModal';
 import LightboxModal from '@/components/LightboxModal';
 import PhotoEditorStudio from '@/components/editor/PhotoEditorStudio';
@@ -23,7 +22,6 @@ export default function Home() {
   // Active UI Views
   const [editingPhoto, setEditingPhoto] = useState<PhotoRecord | null>(null);
   const [lightboxPhotoId, setLightboxPhotoId] = useState<string | null>(null);
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isDropzoneExpanded, setIsDropzoneExpanded] = useState(true);
 
@@ -34,9 +32,7 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const action = params.get('action');
-      if (action === 'camera') {
-        setIsCameraOpen(true);
-      } else if (action === 'upload') {
+      if (action === 'upload') {
         fileInputRef.current?.click();
       }
     }
@@ -87,7 +83,6 @@ export default function Home() {
         photoCount={photos.length}
         yearbookCount={yearbookEntries.length}
         onOpenUpload={() => fileInputRef.current?.click()}
-        onOpenCamera={() => setIsCameraOpen(true)}
         onOpenBackup={() => setIsBackupOpen(true)}
       />
 
@@ -105,7 +100,6 @@ export default function Home() {
             <section>
               <PhotoDropzone
                 onPhotosAdded={() => {}}
-                onOpenCamera={() => setIsCameraOpen(true)}
                 isCompact={photos.length > 0 && !isDropzoneExpanded}
               />
               {photos.length > 0 && (
@@ -138,7 +132,6 @@ export default function Home() {
                 onOpenEditor={handleOpenEditor}
                 onOpenLightbox={(p) => setLightboxPhotoId(p.id)}
                 onRefresh={() => {}}
-                onOpenCamera={() => setIsCameraOpen(true)}
                 onOpenUpload={() => fileInputRef.current?.click()}
               />
             </section>
@@ -161,16 +154,6 @@ export default function Home() {
       </footer>
 
       {/* Modals */}
-      <CameraCaptureModal
-        isOpen={isCameraOpen}
-        onClose={() => setIsCameraOpen(false)}
-        onPhotoCaptured={(photo, openInEditor) => {
-          if (openInEditor) {
-            handleOpenEditor(photo);
-          }
-        }}
-      />
-
       <BackupRestoreModal
         isOpen={isBackupOpen}
         onClose={() => setIsBackupOpen(false)}

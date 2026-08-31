@@ -3,10 +3,10 @@
 import React, { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react';
 import {
   UploadCloud,
+  Upload,
   Image as ImageIcon,
   Sparkles,
   Clipboard,
-  Camera,
   Loader2,
   CheckCircle2,
 } from 'lucide-react';
@@ -14,13 +14,11 @@ import { saveIncomingPhotos } from '@/lib/db';
 
 interface PhotoDropzoneProps {
   onPhotosAdded: () => void;
-  onOpenCamera: () => void;
   isCompact?: boolean;
 }
 
 export default function PhotoDropzone({
   onPhotosAdded,
-  onOpenCamera,
   isCompact = false,
 }: PhotoDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -143,7 +141,7 @@ export default function PhotoDropzone({
                 Drop photos here or click to browse
               </p>
               <p className="text-[11px] text-[#78716c]">
-                Supports PNG, JPEG, WebP, GIF • Paste with Cmd+V
+                Supports PNG, JPEG, WebP, GIF • Click to upload or Cmd+V to paste
               </p>
             </div>
           </div>
@@ -151,12 +149,12 @@ export default function PhotoDropzone({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onOpenCamera();
+              triggerPicker();
             }}
-            className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-[#fbf9f5] px-3 py-1.5 text-xs font-medium text-[#1c1917] hover:bg-[#f5f1e8] transition-all cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl bg-[#c27838] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#a85d26] transition-all cursor-pointer"
           >
-            <Camera className="h-3.5 w-3.5 text-[#c27838]" />
-            <span>Camera</span>
+            <Upload className="h-3.5 w-3.5" />
+            <span>Upload</span>
           </button>
         </div>
       </>
@@ -206,28 +204,20 @@ export default function PhotoDropzone({
 
           {/* Heading */}
           <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
-            Receive & Import Your Photos
+            Upload & Import Your Photos
           </h2>
           <p className="mt-1 max-w-md text-xs sm:text-sm text-[#78716c]">
-            Drag and drop images directly here, browse files, snap with your camera, or paste from clipboard.
+            Select photos directly from your phone, laptop, or iPad, drag & drop files, or paste from clipboard.
           </p>
 
           {/* Action CTAs */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={triggerPicker}
-              className="flex items-center gap-2 rounded-xl bg-[#c27838] px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-[#a85d26] transition-all cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-[#c27838] px-6 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-[#a85d26] transition-all cursor-pointer"
             >
-              <ImageIcon className="h-4 w-4" />
-              <span>Select Photos</span>
-            </button>
-
-            <button
-              onClick={onOpenCamera}
-              className="flex items-center gap-2 rounded-xl border border-[#e7e1d3] bg-[#fbf9f5] px-4 py-2.5 text-xs sm:text-sm font-medium text-[#1c1917] hover:bg-[#f5f1e8] transition-all cursor-pointer"
-            >
-              <Camera className="h-4 w-4 text-[#c27838]" />
-              <span>Camera Snap</span>
+              <Upload className="h-4 w-4" />
+              <span>Choose Photos from Device</span>
             </button>
           </div>
 

@@ -32,7 +32,6 @@ interface NavbarProps {
   currentSection: AppSection;
   onSelectSection: (section: AppSection) => void;
   onOpenUpload: () => void;
-  onOpenCamera: () => void;
   onOpenBackup: () => void;
   photoCount: number;
   yearbookCount: number;
@@ -42,7 +41,6 @@ export default function Navbar({
   currentSection,
   onSelectSection,
   onOpenUpload,
-  onOpenCamera,
   onOpenBackup,
   photoCount,
   yearbookCount,
@@ -197,16 +195,6 @@ export default function Navbar({
           >
             <Database className="h-4 w-4 text-[#c27838]" />
             <span className="hidden sm:inline">Backup</span>
-          </button>
-
-          {/* Camera Snap */}
-          <button
-            onClick={onOpenCamera}
-            className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-white px-3 py-2 text-xs font-medium text-[#1c1917] hover:border-[#c27838] transition-all cursor-pointer"
-            title="Snap a photo"
-          >
-            <Camera className="h-4 w-4 text-[#c27838]" />
-            <span className="hidden sm:inline">Camera</span>
           </button>
 
           {/* Upload Button */}

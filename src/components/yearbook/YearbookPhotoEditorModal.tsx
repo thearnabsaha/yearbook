@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   X,
-  Camera,
   Upload,
   Calendar,
   Sparkles,
@@ -63,12 +62,8 @@ export default function YearbookPhotoEditorModal({
   const todayStr = getLocalTodayString();
   const [selectedDate, setSelectedDate] = useState(initialDate || todayStr);
 
-  // Photo Source
   const [sourceBlob, setSourceBlob] = useState<Blob | null>(null);
   const [previewImg, setPreviewImg] = useState<HTMLImageElement | null>(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
 
   // Ghost / Onion Skinning from Previous Day
   const [ghostImg, setGhostImg] = useState<HTMLImageElement | null>(null);
@@ -188,62 +183,10 @@ export default function YearbookPhotoEditorModal({
     }
   };
 
-  // Camera Management
-  const stopCamera = useCallback(() => {
-    if (cameraStream) {
-      cameraStream.getTracks().forEach((track) => track.stop());
-      setCameraStream(null);
-    }
-    setIsCameraActive(false);
-  }, [cameraStream]);
-
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false,
-      });
-      setCameraStream(stream);
-      setIsCameraActive(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (err) {
-      console.error('Camera access error:', err);
-      alert('Could not access camera device.');
-    }
-  };
-
-  const captureCameraSnap = () => {
-    if (!videoRef.current) return;
-    const video = videoRef.current;
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 1080;
-    canvas.height = video.videoHeight || 1920;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          setSourceBlob(blob);
-          stopCamera();
-        }
-      },
-      'image/jpeg',
-      0.95
-    );
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       setSourceBlob(file);
-      stopCamera();
       e.target.value = '';
     }
   };
@@ -475,7 +418,6 @@ export default function YearbookPhotoEditorModal({
 
           onEntrySaved(record);
           syncYearbookEntryToCloud(record);
-          stopCamera();
           setIsSaving(false);
           onClose();
         },
@@ -518,10 +460,7 @@ export default function YearbookPhotoEditorModal({
           </div>
 
           <button
-            onClick={() => {
-              stopCamera();
-              onClose();
-            }}
+            onClick={onClose}
             className="rounded-xl p-2 text-[#78716c] hover:bg-[#f5f1e8] hover:text-[#1c1917] transition-colors cursor-pointer"
           >
             <X className="h-5 w-5" />
@@ -530,35 +469,9 @@ export default function YearbookPhotoEditorModal({
 
         {/* Workspace: Split View */}
         <div className="flex flex-1 flex-col lg:flex-row overflow-hidden min-h-0">
-          {/* Left: Viewport / Canvas / Live Camera */}
+          {/* Left: Viewport / Canvas */}
           <div className="relative flex flex-1 items-center justify-center bg-[#1c1917] p-4 overflow-hidden min-h-[280px] sm:min-h-[420px]">
-            {/* Live Camera View */}
-            {isCameraActive ? (
-              <div className="relative flex h-full w-full max-h-[420px] items-center justify-center overflow-hidden rounded-2xl bg-black">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="h-full w-full object-cover scale-x-[-1]"
-                />
-
-                <div className="absolute bottom-4 flex items-center gap-3">
-                  <button
-                    onClick={stopCamera}
-                    className="rounded-xl border border-white/20 bg-black/80 px-3.5 py-2 text-xs font-medium text-white"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={captureCameraSnap}
-                    className="flex h-14 w-14 items-center justify-center rounded-full bg-white p-1 shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                  >
-                    <div className="h-full w-full rounded-full border-2 border-black bg-white" />
-                  </button>
-                </div>
-              </div>
-            ) : sourceBlob ? (
+            {sourceBlob ? (
               /* Canvas Viewport */
               <div className="relative flex items-center justify-center max-h-[70vh] max-w-full">
                 <canvas
@@ -589,31 +502,31 @@ export default function YearbookPhotoEditorModal({
               </div>
             ) : (
               /* Empty Intake */
-              <div className="flex flex-col items-center justify-center p-6 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#292524] text-[#c27838] mb-3 border border-stone-700">
-                  <Camera className="h-8 w-8" />
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="group flex flex-col items-center justify-center p-8 text-center cursor-pointer rounded-2xl border-2 border-dashed border-stone-700 hover:border-[#c27838] transition-all max-w-sm"
+              >
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#292524] text-[#c27838] mb-3 border border-stone-700 group-hover:scale-105 transition-transform">
+                  <Upload className="h-8 w-8" />
                 </div>
                 <h4 className="font-display text-sm font-bold text-white">
-                  Add Photo for {selectedDate}
+                  Upload Photo for {selectedDate}
                 </h4>
                 <p className="text-xs text-stone-400 mt-1 max-w-xs">
-                  Snap or choose a photo. Eyes will be automatically detected and aligned.
+                  Select a photo from your phone, laptop, or iPad. Eyes will be automatically detected and aligned.
                 </p>
 
-                <div className="mt-5 flex gap-3">
+                <div className="mt-5">
                   <button
-                    onClick={startCamera}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#c27838] px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-[#a85d26] cursor-pointer"
-                  >
-                    <Camera className="h-4 w-4" />
-                    <span>Camera Snap</span>
-                  </button>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-1.5 rounded-xl border border-stone-700 bg-[#292524] px-4 py-2 text-xs font-medium text-stone-200 hover:bg-stone-800 cursor-pointer"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    className="flex items-center gap-2 rounded-xl bg-[#c27838] px-5 py-2.5 text-xs font-semibold text-white shadow-md hover:bg-[#a85d26] transition-all cursor-pointer"
                   >
                     <Upload className="h-4 w-4" />
-                    <span>Upload Photo</span>
+                    <span>Choose Photo from Device</span>
                   </button>
                 </div>
               </div>
@@ -875,24 +788,15 @@ export default function YearbookPhotoEditorModal({
               </div>
             </div>
 
-            {/* 5. Replace / Snap Actions */}
-            <div className="flex gap-2 pt-2 border-t border-[#e7e1d3]">
-              <button
-                type="button"
-                onClick={startCamera}
-                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-white py-2 text-xs font-medium text-[#1c1917] hover:bg-[#f5f1e8] cursor-pointer"
-              >
-                <Camera className="h-3.5 w-3.5 text-[#c27838]" />
-                <span>Snap New</span>
-              </button>
-
+            {/* 5. Replace Photo Action */}
+            <div className="pt-2 border-t border-[#e7e1d3]">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-white py-2 text-xs font-medium text-[#1c1917] hover:bg-[#f5f1e8] cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#e7e1d3] bg-white py-2.5 text-xs font-medium text-[#1c1917] hover:bg-[#f5f1e8] transition-colors cursor-pointer"
               >
-                <Upload className="h-3.5 w-3.5 text-[#c27838]" />
-                <span>Choose File</span>
+                <Upload className="h-4 w-4 text-[#c27838]" />
+                <span>Choose Different Photo from Device</span>
               </button>
             </div>
 

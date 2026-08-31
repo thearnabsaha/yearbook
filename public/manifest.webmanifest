@@ -38,13 +38,6 @@
   },
   "shortcuts": [
     {
-      "name": "New Camera Snap",
-      "short_name": "Camera",
-      "description": "Snap a new photo with live camera",
-      "url": "/?action=camera",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
       "name": "Upload Photos",
       "short_name": "Upload",
       "description": "Select photos from your device",
