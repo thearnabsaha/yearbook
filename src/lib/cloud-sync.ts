@@ -132,26 +132,11 @@ export async function deleteYearbookEntryFromCloud(id: string): Promise<void> {
   }
 }
 
-// Auto-sync on window focus or visibility change
-if (typeof window !== 'undefined') {
-  window.addEventListener('focus', () => {
-    pullAllFromCloud();
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      pullAllFromCloud();
-    }
-  });
-}
-
 // Pull all data from MongoDB Atlas to local IndexedDB
 export async function pullAllFromCloud(): Promise<{
   syncedProjects: number;
   syncedYearbook: number;
 }> {
-  currentSyncStatus.isSyncing = true;
-  notifyStatusChange();
-
   let syncedProjects = 0;
   let syncedYearbook = 0;
 
@@ -194,9 +179,6 @@ export async function pullAllFromCloud(): Promise<{
   } catch (err: any) {
     console.error('Pull all from cloud error:', err);
     currentSyncStatus.error = err.message;
-  } finally {
-    currentSyncStatus.isSyncing = false;
-    notifyStatusChange();
   }
 
   return { syncedProjects, syncedYearbook };
@@ -204,9 +186,6 @@ export async function pullAllFromCloud(): Promise<{
 
 // Push all local IndexedDB data to MongoDB Atlas
 export async function pushAllToCloud(): Promise<void> {
-  currentSyncStatus.isSyncing = true;
-  notifyStatusChange();
-
   try {
     const [projects, entries] = await Promise.all([
       db.yearbookProjects.toArray(),
@@ -225,8 +204,63 @@ export async function pushAllToCloud(): Promise<void> {
     currentSyncStatus.connected = true;
   } catch (err: any) {
     console.error('Push all to cloud error:', err);
+  }
+}
+
+let isPerformingFullSync = false;
+
+// Seamless Automatic Bidirectional Sync
+export async function fullBidirectionalSync(): Promise<void> {
+  if (isPerformingFullSync) return;
+  isPerformingFullSync = true;
+  currentSyncStatus.isSyncing = true;
+  notifyStatusChange();
+
+  try {
+    // 1. Check cloud health
+    const isConnected = await checkCloudConnectionStatus();
+    if (!isConnected) return;
+
+    // 2. Push any local photos that might have been taken offline
+    await pushAllToCloud();
+
+    // 3. Pull latest photos & projects from other devices
+    await pullAllFromCloud();
+  } catch (err: any) {
+    console.warn('Seamless background sync error:', err);
   } finally {
+    isPerformingFullSync = false;
     currentSyncStatus.isSyncing = false;
     notifyStatusChange();
   }
+}
+
+// Automatic background triggers
+if (typeof window !== 'undefined') {
+  // Trigger on initial page boot
+  setTimeout(() => {
+    fullBidirectionalSync();
+  }, 500);
+
+  // Trigger when switching back to tab or unlocking device
+  window.addEventListener('focus', () => {
+    fullBidirectionalSync();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      fullBidirectionalSync();
+    }
+  });
+
+  window.addEventListener('online', () => {
+    fullBidirectionalSync();
+  });
+
+  // Background interval polling every 12 seconds
+  setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      fullBidirectionalSync();
+    }
+  }, 12000);
 }

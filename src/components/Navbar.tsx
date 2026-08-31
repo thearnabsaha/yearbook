@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { Database } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Database, RefreshCw } from 'lucide-react';
 import {
-  checkCloudConnectionStatus,
-  pullAllFromCloud,
+  fullBidirectionalSync,
+  subscribeToSyncStatus,
+  SyncStatus,
 } from '@/lib/cloud-sync';
 
 interface NavbarProps {
@@ -18,11 +19,15 @@ export default function Navbar({
   yearbookCount,
   onToggleLanding,
 }: NavbarProps) {
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
+
   useEffect(() => {
-    // Silent background sync
-    checkCloudConnectionStatus();
-    pullAllFromCloud();
-  }, [yearbookCount]);
+    const unsub = subscribeToSyncStatus((status) => {
+      setSyncStatus(status);
+    });
+    fullBidirectionalSync();
+    return unsub;
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#e7e1d3]/80 bg-[#fbf9f5]/85 backdrop-blur-xl transition-all">
@@ -62,9 +67,13 @@ export default function Navbar({
             type="button"
             onClick={onOpenBackup}
             className="flex items-center gap-1.5 rounded-full border border-[#e7e1d3] bg-white px-3 py-1.5 text-xs font-semibold text-[#1c1917] shadow-xs hover:bg-[#f5f1e8] hover:border-[#c27838] transition-all cursor-pointer"
-            title="Backup & Export Data"
+            title="Backup & Multi-Device Cloud Sync"
           >
-            <Database className="h-3.5 w-3.5 text-[#c27838]" />
+            {syncStatus?.isSyncing ? (
+              <RefreshCw className="h-3.5 w-3.5 text-[#c27838] animate-spin" />
+            ) : (
+              <Database className="h-3.5 w-3.5 text-[#c27838]" />
+            )}
             <span>Backup</span>
           </button>
         </div>
