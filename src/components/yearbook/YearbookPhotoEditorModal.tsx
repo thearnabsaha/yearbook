@@ -470,36 +470,66 @@ export default function YearbookPhotoEditorModal({
         {/* Workspace: Split View */}
         <div className="flex flex-1 flex-col lg:flex-row overflow-hidden min-h-0">
           {/* Left: Viewport / Canvas */}
-          <div className="relative flex flex-1 items-center justify-center bg-[#1c1917] p-4 overflow-hidden min-h-[280px] sm:min-h-[420px]">
+          <div className="relative flex flex-1 flex-col items-center justify-center bg-[#1c1917] p-3 sm:p-4 overflow-hidden min-h-[260px] sm:min-h-[420px]">
             {sourceBlob ? (
-              /* Canvas Viewport */
-              <div className="relative flex items-center justify-center max-h-[70vh] max-w-full">
-                <canvas
-                  ref={previewCanvasRef}
-                  className="max-h-[60vh] sm:max-h-[70vh] max-w-full rounded-xl shadow-2xl object-contain border border-stone-800"
-                />
+              <>
+                {/* Top Viewport Toolbar */}
+                <div className="z-20 mb-2 flex flex-wrap items-center justify-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md p-1 border border-white/10">
+                  {(['9:16', '1:1', '4:5', 'free'] as const).map((ratio) => (
+                    <button
+                      key={ratio}
+                      type="button"
+                      onClick={() => setAspectRatio(ratio)}
+                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                        aspectRatio === ratio
+                          ? 'bg-[#c27838] text-white shadow-xs'
+                          : 'text-stone-400 hover:text-white'
+                      }`}
+                    >
+                      {ratio === 'free' ? 'Original' : ratio}
+                    </button>
+                  ))}
 
-                {/* Face & Eye Alignment Crosshair Guide */}
-                {showFaceGuide && (
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <div className="absolute top-[38%] left-0 right-0 border-t-2 border-dashed border-[#c27838]" />
-                    <span className="absolute top-[38%] left-3 -translate-y-5 text-[9px] font-mono text-white font-bold bg-[#c27838] px-1.5 py-0.5 rounded shadow">
-                      EYE ALIGNMENT LEVEL
-                    </span>
+                  <div className="h-3 w-px bg-white/20 mx-0.5" />
 
-                    <div className="absolute top-0 bottom-0 left-1/2 border-l-2 border-dashed border-[#c27838]/80" />
-                    <div className="h-24 w-24 rounded-full border-2 border-dashed border-[#c27838]/80" />
-                  </div>
-                )}
+                  <button
+                    type="button"
+                    onClick={() => setAlignment((prev) => ({ ...prev, scale: 0.75, offsetX: 0, offsetY: 0 }))}
+                    className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-stone-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    Fit Whole Photo
+                  </button>
+                </div>
 
-                {/* Auto-Align Success Toast */}
-                {autoAlignSuccess && (
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-[#c27838] px-3.5 py-1.5 text-xs font-medium text-white shadow-lg animate-in fade-in">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    <span>Eyes & Face Auto-Aligned</span>
-                  </div>
-                )}
-              </div>
+                {/* Canvas Viewport */}
+                <div className="relative flex items-center justify-center max-h-[40vh] sm:max-h-[65vh] max-w-full">
+                  <canvas
+                    ref={previewCanvasRef}
+                    className="max-h-[38vh] sm:max-h-[65vh] max-w-full rounded-xl shadow-2xl object-contain border border-stone-800"
+                  />
+
+                  {/* Face & Eye Alignment Crosshair Guide */}
+                  {showFaceGuide && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                      <div className="absolute top-[38%] left-0 right-0 border-t-2 border-dashed border-[#c27838]" />
+                      <span className="absolute top-[38%] left-3 -translate-y-5 text-[9px] font-mono text-white font-bold bg-[#c27838] px-1.5 py-0.5 rounded shadow">
+                        EYE ALIGNMENT LEVEL
+                      </span>
+
+                      <div className="absolute top-0 bottom-0 left-1/2 border-l-2 border-dashed border-[#c27838]/80" />
+                      <div className="h-24 w-24 rounded-full border-2 border-dashed border-[#c27838]/80" />
+                    </div>
+                  )}
+
+                  {/* Auto-Align Success Toast */}
+                  {autoAlignSuccess && (
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-[#c27838] px-3 py-1 text-[11px] font-medium text-white shadow-lg animate-in fade-in">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      <span>Eyes & Face Auto-Aligned</span>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               /* Empty Intake */
               <div

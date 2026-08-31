@@ -28,6 +28,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import YearbookPhotoEditorModal from './YearbookPhotoEditorModal';
+import YearbookPhotoViewerModal from './YearbookPhotoViewerModal';
 import CreateYearbookModal from './CreateYearbookModal';
 import TimelapsePlayerModal from './TimelapsePlayerModal';
 import {
@@ -49,10 +50,12 @@ interface YearbookHubProps {
 // Single Day Card in the Timeline
 function YearbookDayCard({
   entry,
+  onView,
   onEdit,
   onDelete,
 }: {
   entry: YearbookEntry;
+  onView: (entry: YearbookEntry) => void;
   onEdit: (entry: YearbookEntry) => void;
   onDelete: (id: string) => void;
 }) {
@@ -70,7 +73,7 @@ function YearbookDayCard({
 
   return (
     <div
-      onClick={() => onEdit(entry)}
+      onClick={() => onView(entry)}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#e7e1d3] bg-white hover:border-[#c27838] hover:shadow-lg hover:shadow-stone-900/5 transition-all duration-300 cursor-pointer"
     >
       {/* Media Viewport */}
@@ -108,6 +111,17 @@ function YearbookDayCard({
 
         {/* Hover Quick Actions */}
         <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-black/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onView(entry);
+            }}
+            className="flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-semibold text-[#1c1917] shadow-md hover:bg-[#f5f1e8] transition-all cursor-pointer"
+          >
+            <span>View</span>
+          </button>
+
           <button
             type="button"
             onClick={(e) => {
@@ -189,6 +203,9 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
   // Modals
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [editingProjectForModal, setEditingProjectForModal] = useState<YearbookProject | null>(null);
+
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [viewingEntry, setViewingEntry] = useState<YearbookEntry | null>(null);
 
   const [isPhotoEditorOpen, setIsPhotoEditorOpen] = useState(false);
   const [selectedDateForEditor, setSelectedDateForEditor] = useState<string>(
@@ -513,7 +530,14 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
             return (
               <button
                 key={day.dateStr}
-                onClick={() => handleOpenAddForDate(day.dateStr)}
+                onClick={() => {
+                  if (day.entry) {
+                    setViewingEntry(day.entry);
+                    setIsViewerOpen(true);
+                  } else {
+                    handleOpenAddForDate(day.dateStr);
+                  }
+                }}
                 className={`group relative flex flex-col items-center justify-between rounded-xl border p-2 sm:p-2.5 min-h-[56px] sm:min-h-[64px] transition-all cursor-pointer ${
                   hasEntry
                     ? 'border-[#c27838] bg-[#f5f1e8] text-[#1c1917] shadow-xs'
@@ -525,7 +549,7 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
                 }`}
                 title={
                   hasEntry
-                    ? `Logged: ${day.entry?.caption || 'Photo'} (${day.dateStr})`
+                    ? `Click to view full photo for ${day.dateStr}`
                     : `Click to log photo for ${day.dateStr}`
                 }
               >
@@ -573,6 +597,10 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
               <YearbookDayCard
                 key={entry.id}
                 entry={entry}
+                onView={(e) => {
+                  setViewingEntry(e);
+                  setIsViewerOpen(true);
+                }}
                 onEdit={(e) => {
                   setSelectedDateForEditor(e.date);
                   setEditingEntry(e);
@@ -605,6 +633,23 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
       </div>
 
       {/* Modals */}
+      <YearbookPhotoViewerModal
+        isOpen={isViewerOpen}
+        onClose={() => {
+          setIsViewerOpen(false);
+          setViewingEntry(null);
+        }}
+        entry={viewingEntry}
+        entries={entries}
+        currentProject={activeProject}
+        onEdit={(e) => {
+          setSelectedDateForEditor(e.date);
+          setEditingEntry(e);
+          setIsPhotoEditorOpen(true);
+        }}
+        onDelete={handleDeleteEntry}
+      />
+
       <YearbookPhotoEditorModal
         isOpen={isPhotoEditorOpen}
         onClose={() => {
