@@ -643,23 +643,26 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
         onDelete={handleDeleteEntry}
       />
 
-      <YearbookPhotoEditorModal
-        isOpen={isPhotoEditorOpen}
-        onClose={() => {
-          setIsPhotoEditorOpen(false);
-          setEditingEntry(null);
-        }}
-        currentProject={activeProject}
-        initialDate={selectedDateForEditor}
-        existingEntry={editingEntry}
-        onEntrySaved={async () => {
-          const exists = await db.yearbookProjects.get(activeProject.id);
-          if (!exists) {
-            await db.yearbookProjects.put(activeProject);
-            syncYearbookProjectToCloud(activeProject);
-          }
-        }}
-      />
+      {isPhotoEditorOpen && (
+        <YearbookPhotoEditorModal
+          key={`modal_${activeProject.id}_${selectedDateForEditor}_${editingEntry?.id || 'new'}`}
+          isOpen={isPhotoEditorOpen}
+          onClose={() => {
+            setIsPhotoEditorOpen(false);
+            setEditingEntry(null);
+          }}
+          currentProject={activeProject}
+          initialDate={selectedDateForEditor}
+          existingEntry={editingEntry}
+          onEntrySaved={async () => {
+            const exists = await db.yearbookProjects.get(activeProject.id);
+            if (!exists) {
+              await db.yearbookProjects.put(activeProject);
+              syncYearbookProjectToCloud(activeProject);
+            }
+          }}
+        />
+      )}
 
       <TimelapsePlayerModal
         isOpen={isTimelapseOpen}

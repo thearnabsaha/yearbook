@@ -60,9 +60,9 @@ export default function YearbookPhotoEditorModal({
   onEntrySaved,
 }: YearbookPhotoEditorModalProps) {
   const todayStr = getLocalTodayString();
-  const [selectedDate, setSelectedDate] = useState(initialDate || todayStr);
+  const [selectedDate, setSelectedDate] = useState(existingEntry?.date || initialDate || todayStr);
 
-  const [sourceBlob, setSourceBlob] = useState<Blob | null>(null);
+  const [sourceBlob, setSourceBlob] = useState<Blob | null>(existingEntry?.photoBlob || null);
   const [previewImg, setPreviewImg] = useState<HTMLImageElement | null>(null);
 
   // Ghost / Onion Skinning from Previous Day
@@ -71,102 +71,73 @@ export default function YearbookPhotoEditorModal({
   const [showGhost, setShowGhost] = useState(false);
 
   // Alignment & Scaling Transformation
-  const [alignment, setAlignment] = useState<YearbookAlignment>(DEFAULT_ALIGNMENT);
+  const [alignment, setAlignment] = useState<YearbookAlignment>(
+    existingEntry?.alignment || DEFAULT_ALIGNMENT
+  );
   const [isAutoAligning, setIsAutoAligning] = useState(false);
   const [autoAlignSuccess, setAutoAlignSuccess] = useState(false);
   const [showFaceGuide, setShowFaceGuide] = useState(true);
 
   // Caption & Snapchat styling
-  const [caption, setCaption] = useState('');
-  const [captionY, setCaptionY] = useState(75);
-  const [captionStyle, setCaptionStyle] = useState<'snapchat' | 'minimal' | 'badge' | 'neon'>('snapchat');
-  const [showDateStamp, setShowDateStamp] = useState(true);
-  const [showDayCount, setShowDayCount] = useState(true);
+  const [caption, setCaption] = useState(existingEntry?.caption || '');
+  const [captionY, setCaptionY] = useState(existingEntry?.captionY ?? 75);
+  const [captionStyle, setCaptionStyle] = useState<'snapchat' | 'minimal' | 'badge' | 'neon'>(
+    existingEntry?.captionStyle || 'snapchat'
+  );
+  const [showDateStamp, setShowDateStamp] = useState(existingEntry?.showDateStamp ?? true);
+  const [showDayCount, setShowDayCount] = useState(existingEntry?.showDayCount ?? true);
 
   const [aspectRatio, setAspectRatio] = useState<YearbookAspectRatio>(
-    currentProject?.aspectRatio || '9:16'
+    existingEntry?.aspectRatio || currentProject?.aspectRatio || '9:16'
   );
 
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const wasOpenRef = useRef(false);
-
-  // Load entry or initialize date only on initial modal open
+  // On initial mount, load existing photo if present, and load ghost image
   useEffect(() => {
-    if (!isOpen) {
-      wasOpenRef.current = false;
-      return;
-    }
+    let isCancelled = false;
 
-    // Only run initialization once per modal open
-    if (!wasOpenRef.current) {
-      wasOpenRef.current = true;
-
-      if (existingEntry) {
-        setSelectedDate(existingEntry.date);
-        setSourceBlob(existingEntry.photoBlob);
-        setCaption(existingEntry.caption || '');
-        setCaptionY(existingEntry.captionY ?? 75);
-        setCaptionStyle(existingEntry.captionStyle || 'snapchat');
-        setAspectRatio(existingEntry.aspectRatio || currentProject?.aspectRatio || '9:16');
-        setShowDateStamp(existingEntry.showDateStamp ?? true);
-        setShowDayCount(existingEntry.showDayCount ?? true);
-        setAlignment(existingEntry.alignment || DEFAULT_ALIGNMENT);
-      } else {
-        const targetDate = initialDate || todayStr;
-        setSelectedDate(targetDate);
-        setSourceBlob(null);
-        setCaption('');
-        setCaptionY(75);
-        setCaptionStyle('snapchat');
-        setAspectRatio(currentProject?.aspectRatio || '9:16');
-        setShowDateStamp(true);
-        setShowDayCount(true);
-        setAlignment(DEFAULT_ALIGNMENT);
-
-        if (currentProject) {
-          getYearbookEntryByDate(currentProject.id, targetDate).then((entry) => {
-            if (entry) {
-              setSourceBlob(entry.photoBlob);
-              setCaption(entry.caption || '');
-              setCaptionY(entry.captionY ?? 75);
-              setCaptionStyle(entry.captionStyle || 'snapchat');
-              setAspectRatio(entry.aspectRatio || currentProject.aspectRatio || '9:16');
-              setShowDateStamp(entry.showDateStamp ?? true);
-              setShowDayCount(entry.showDayCount ?? true);
-              setAlignment(entry.alignment || DEFAULT_ALIGNMENT);
-            }
-          });
-        }
-      }
-
-      // Fetch previous day entry for onion-skinning reference
-      if (currentProject) {
-        getPreviousDayEntry(currentProject.id, initialDate || todayStr).then((prevEntry) => {
-          if (prevEntry) {
-            loadImageFromBlob(prevEntry.photoBlob).then((gImg) => {
-              setGhostImg(gImg);
+    if (existingEntry?.photoBlob) {
+      loadImageFromBlob(existingEntry.photoBlob).then((img) => {
+        if (!isCancelled) setPreviewImg(img);
+      });
+    } else {
+      const targetDate = initialDate || todayStr;
+      if (currentProject?.id) {
+        getYearbookEntryByDate(currentProject.id, targetDate).then((entry) => {
+          if (!isCancelled && entry?.photoBlob) {
+            setSourceBlob(entry.photoBlob);
+            setCaption(entry.caption || '');
+            setCaptionY(entry.captionY ?? 75);
+            setCaptionStyle(entry.captionStyle || 'snapchat');
+            setAspectRatio(entry.aspectRatio || currentProject.aspectRatio || '9:16');
+            setShowDateStamp(entry.showDateStamp ?? true);
+            setShowDayCount(entry.showDayCount ?? true);
+            setAlignment(entry.alignment || DEFAULT_ALIGNMENT);
+            loadImageFromBlob(entry.photoBlob).then((img) => {
+              if (!isCancelled) setPreviewImg(img);
             });
-          } else {
-            setGhostImg(null);
           }
         });
       }
     }
-  }, [isOpen, existingEntry, initialDate, currentProject?.id, todayStr]);
 
-  // Load image element from source blob
-  useEffect(() => {
-    if (sourceBlob) {
-      loadImageFromBlob(sourceBlob).then((img) => {
-        setPreviewImg(img);
+    if (currentProject?.id) {
+      getPreviousDayEntry(currentProject.id, initialDate || todayStr).then((prevEntry) => {
+        if (!isCancelled && prevEntry?.photoBlob) {
+          loadImageFromBlob(prevEntry.photoBlob).then((gImg) => {
+            if (!isCancelled) setGhostImg(gImg);
+          });
+        }
       });
-    } else {
-      setPreviewImg(null);
     }
-  }, [sourceBlob]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
