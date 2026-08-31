@@ -119,26 +119,19 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
             <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl overflow-hidden shadow-xs ring-1 ring-[#c27838]/30 shrink-0">
               <img
                 src="/icons/icon-192.png"
-                alt="Yearbook Crest"
+                alt="Yearbook"
                 className="h-full w-full object-cover"
               />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
-                  Year<span className="text-[#c27838]">book</span>
-                </span>
-                <span className="hidden sm:inline-flex rounded-full bg-[#f5f1e8] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#c27838] border border-[#e7e1d3]">
-                  Daily Studio
-                </span>
-              </div>
-            </div>
+            <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
+              Year<span className="text-[#c27838]">book</span>
+            </span>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={onEnterApp}
-              className="group flex items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl bg-[#1c1917] px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-[#c27838] transition-all duration-300 cursor-pointer"
+              className="group flex items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl bg-[#1c1917] px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-[#c27838] transition-all duration-300 cursor-pointer"
             >
               <span>Open Studio</span>
               <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-1" />
@@ -147,17 +140,13 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
         </div>
       </header>
 
-      {/* Hero Section: Editorial Maximalism */}
-      <section className="relative mx-auto max-w-7xl px-4 pt-12 pb-16 sm:px-6 sm:pt-20 sm:pb-24">
-        {/* Vintage Top Badge */}
+      {/* Hero Section: Editorial */}
+      <section className="relative mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 sm:pt-18 sm:pb-24">
+        {/* Clean Top Tag */}
         <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#e7e1d3] bg-white px-4 py-1.5 shadow-xs">
-            <span className="flex h-2 w-2 rounded-full bg-[#c27838] animate-pulse" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-[#78716c]">
-              Memory Preservation & Growth Architecture
-            </span>
-            <span className="text-[#e7e1d3]">•</span>
-            <span className="text-xs font-bold text-[#c27838]">100% Client-Side</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#e7e1d3] bg-white px-3.5 py-1 text-xs font-semibold text-[#c27838] shadow-xs">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Daily Photo Timelapse Studio</span>
           </div>
         </div>
 
