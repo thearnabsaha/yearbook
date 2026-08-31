@@ -67,75 +67,75 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#e7e1d3] bg-[#fbf9f5]/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-        {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-[#c27838] text-white shadow-sm">
-            <Sparkles className="h-5 w-5 text-white" />
+    <header className="sticky top-0 z-40 w-full max-w-full border-b border-[#e7e1d3] bg-[#fbf9f5]/95 backdrop-blur-md overflow-x-hidden">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3">
+        {/* Brand & Status */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#c27838] text-white shadow-xs">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-display text-lg font-bold tracking-tight text-[#1c1917]">
-                Year<span className="text-[#c27838]">book</span>
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#f5f1e8] px-2 py-0.5 text-[10px] font-semibold text-[#c27838] border border-[#e7e1d3]">
-                <ShieldCheck className="h-3 w-3" />
-                PWA
-              </span>
 
-              {/* MongoDB Cloud Status Pill */}
-              <button
-                type="button"
-                onClick={handleManualSync}
-                title={
-                  syncStatus.connected
-                    ? `Connected to MongoDB Atlas. Click to sync now.`
-                    : `Offline mode (local storage). Set MONGODB_URI in Vercel to sync.`
-                }
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold border transition-all cursor-pointer ${
-                  syncStatus.connected
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                    : 'bg-stone-100 text-stone-600 border-stone-200'
-                }`}
-              >
-                {syncStatus.isSyncing ? (
-                  <>
-                    <Loader2 className="h-3 w-3 animate-spin text-emerald-600" />
-                    <span>Syncing...</span>
-                  </>
-                ) : syncStatus.connected ? (
-                  <>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <span>MongoDB Synced</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="h-1.5 w-1.5 rounded-full bg-stone-400" />
-                    <span>Local Storage</span>
-                  </>
-                )}
-              </button>
-            </div>
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="font-serif-editorial text-base sm:text-lg font-bold tracking-tight text-[#1c1917] shrink-0">
+              Year<span className="text-[#c27838] italic">book</span>
+            </span>
+
+            {/* PWA Badge (hidden on smallest screens) */}
+            <span className="hidden md:inline-flex items-center gap-1 rounded-full bg-[#f5f1e8] px-2 py-0.5 text-[10px] font-semibold text-[#c27838] border border-[#e7e1d3]">
+              <ShieldCheck className="h-3 w-3" />
+              PWA
+            </span>
+
+            {/* MongoDB Cloud Status Pill */}
+            <button
+              type="button"
+              onClick={handleManualSync}
+              title={
+                syncStatus.connected
+                  ? `Connected to MongoDB Atlas. Click to sync now.`
+                  : `Offline mode (local storage). Set MONGODB_URI in Vercel to sync.`
+              }
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold border transition-all cursor-pointer truncate max-w-[130px] sm:max-w-none ${
+                syncStatus.connected
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                  : 'bg-stone-100 text-stone-600 border-stone-200'
+              }`}
+            >
+              {syncStatus.isSyncing ? (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin text-emerald-600 shrink-0" />
+                  <span className="hidden sm:inline">Syncing...</span>
+                </>
+              ) : syncStatus.connected ? (
+                <>
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="hidden sm:inline">MongoDB Synced</span>
+                  <span className="sm:hidden">Synced</span>
+                </>
+              ) : (
+                <>
+                  <span className="h-1.5 w-1.5 rounded-full bg-stone-400 shrink-0" />
+                  <span className="hidden sm:inline">Local Storage</span>
+                  <span className="sm:hidden">Local</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
         {/* Action Buttons Right */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Storage Meter */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Storage Meter (Desktop only) */}
           {storageInfo && storageInfo.usage > 0 && (
             <button
               onClick={onOpenBackup}
               title={`Using ${storageInfo.usageFormatted} of local storage`}
-              className="hidden sm:flex items-center gap-2 rounded-xl border border-[#e7e1d3] bg-white px-3 py-1.5 text-xs text-[#1c1917] hover:border-[#c27838] transition-all cursor-pointer"
+              className="hidden lg:flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-white px-2.5 py-1 text-xs text-[#1c1917] hover:border-[#c27838] transition-all cursor-pointer"
             >
               <HardDrive className="h-3.5 w-3.5 text-[#c27838]" />
-              <div className="flex flex-col items-start text-[11px]">
-                <span className="text-[#78716c]">Storage</span>
-                <span className="font-medium text-[#1c1917]">
-                  {storageInfo.usageFormatted}
-                </span>
-              </div>
+              <span className="text-[11px] font-medium text-[#1c1917]">
+                {storageInfo.usageFormatted}
+              </span>
             </button>
           )}
 
@@ -143,21 +143,22 @@ export default function Navbar({
           {onToggleLanding && (
             <button
               onClick={onToggleLanding}
-              className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-[#f5f1e8] px-3.5 py-2 text-xs font-medium text-[#1c1917] hover:bg-[#e7e1d3] transition-all cursor-pointer"
+              className="flex items-center rounded-xl border border-[#e7e1d3] bg-[#f5f1e8] px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs font-medium text-[#1c1917] hover:bg-[#e7e1d3] transition-all cursor-pointer shrink-0"
               title="View Landing Page Overview"
             >
-              <span>Overview</span>
+              <span>Home</span>
             </button>
           )}
 
           {/* Backup & Data Hub */}
           <button
             onClick={onOpenBackup}
-            className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-white px-3.5 py-2 text-xs font-medium text-[#1c1917] hover:border-[#c27838] transition-all cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-white px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs font-medium text-[#1c1917] hover:border-[#c27838] transition-all cursor-pointer shrink-0"
             title="Backup & Restore database"
           >
-            <Database className="h-4 w-4 text-[#c27838]" />
-            <span>Backup & Export</span>
+            <Database className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#c27838]" />
+            <span className="hidden sm:inline">Backup & Export</span>
+            <span className="sm:hidden">Backup</span>
           </button>
         </div>
       </div>

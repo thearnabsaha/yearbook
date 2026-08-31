@@ -8,11 +8,13 @@
   --font-serif: var(--font-serif-display), Georgia, "Times New Roman", serif;
 }
 
-body {
+html, body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 .font-serif-editorial {

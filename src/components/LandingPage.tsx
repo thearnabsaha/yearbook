@@ -114,30 +114,30 @@ export default function LandingPage({ onEnterApp, yearbookCount }: LandingPagePr
 
       {/* Top Maximalist Editorial Navigation Bar */}
       <header className="sticky top-0 z-50 border-b border-[#e7e1d3] bg-[#fbf9f5]/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#c27838] text-white shadow-sm ring-2 ring-[#c27838]/20">
-              <Sparkles className="h-5 w-5" />
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-2.5 sm:px-6 sm:py-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[#c27838] text-white shadow-sm ring-2 ring-[#c27838]/20 shrink-0">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-serif-editorial text-xl font-bold tracking-tight text-[#1c1917]">
+                <span className="font-serif-editorial text-lg sm:text-xl font-bold tracking-tight text-[#1c1917]">
                   Year<span className="text-[#c27838] italic">book</span>
                 </span>
-                <span className="rounded-full bg-[#f5f1e8] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#c27838] border border-[#e7e1d3]">
+                <span className="hidden sm:inline-flex rounded-full bg-[#f5f1e8] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#c27838] border border-[#e7e1d3]">
                   Vol. I • Studio PWA
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={onEnterApp}
-              className="group flex items-center gap-2 rounded-2xl bg-[#1c1917] px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-[#c27838] transition-all duration-300 cursor-pointer"
+              className="group flex items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl bg-[#1c1917] px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-[#c27838] transition-all duration-300 cursor-pointer"
             >
               <span>Open Studio</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         </div>
