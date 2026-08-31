@@ -39,6 +39,7 @@ import {
 import {
   deleteYearbookEntryFromCloud,
   deleteYearbookProjectFromCloud,
+  syncYearbookProjectToCloud,
 } from '@/lib/cloud-sync';
 
 interface YearbookHubProps {
@@ -150,6 +151,16 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
   const projects = useLiveQuery(() => db.yearbookProjects.toArray(), []) || [];
   const [activeProjectId, setActiveProjectId] = useState<string>('yb_main');
 
+  const fallbackDefaultProject: YearbookProject = useMemo(() => ({
+    id: 'yb_main',
+    title: 'My Daily Photo Yearbook',
+    description: 'Daily photo timelapse journey',
+    aspectRatio: '9:16',
+    startDate: getLocalTodayString(),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  }), []);
+
   useEffect(() => {
     ensureDefaultYearbookProject().then((def) => {
       if (!activeProjectId || activeProjectId === 'yb_main') {
@@ -158,9 +169,9 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
     });
   }, [activeProjectId]);
 
-  const activeProject = useMemo(() => {
-    return projects.find((p) => p.id === activeProjectId) || projects[0] || null;
-  }, [projects, activeProjectId]);
+  const activeProject: YearbookProject = useMemo(() => {
+    return projects.find((p) => p.id === activeProjectId) || projects[0] || fallbackDefaultProject;
+  }, [projects, activeProjectId, fallbackDefaultProject]);
 
   const rawEntries =
     useLiveQuery(
@@ -168,7 +179,7 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
         activeProject
           ? db.yearbook.where('yearbookId').equals(activeProject.id).toArray()
           : db.yearbook.toArray(),
-      [activeProject?.id]
+      [activeProject.id]
     ) || [];
 
   const entries = useMemo(() => {
@@ -336,7 +347,15 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => handleOpenAddForDate(todayStr)}
+            className="flex items-center gap-1.5 rounded-xl bg-[#c27838] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#a85d26] transition-all cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Upload Photo ({todayStr})</span>
+          </button>
+
           <button
             onClick={() => {
               setEditingProjectForModal(activeProject);
@@ -364,10 +383,10 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
               setEditingProjectForModal(null);
               setIsCreateProjectOpen(true);
             }}
-            className="flex items-center gap-1.5 rounded-xl bg-[#c27838] px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#a85d26] transition-all cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl border border-[#e7e1d3] bg-white px-3 py-2 text-xs font-medium text-[#1c1917] hover:bg-[#f5f1e8] transition-all cursor-pointer"
           >
-            <FolderPlus className="h-4 w-4" />
-            <span>Create New Yearbook</span>
+            <FolderPlus className="h-4 w-4 text-[#c27838]" />
+            <span>New Series</span>
           </button>
         </div>
       </div>
@@ -586,28 +605,30 @@ export default function YearbookHub({ className }: YearbookHubProps = {}) {
       </div>
 
       {/* Modals */}
-      {activeProject && (
-        <YearbookPhotoEditorModal
-          isOpen={isPhotoEditorOpen}
-          onClose={() => {
-            setIsPhotoEditorOpen(false);
-            setEditingEntry(null);
-          }}
-          currentProject={activeProject}
-          initialDate={selectedDateForEditor}
-          existingEntry={editingEntry}
-          onEntrySaved={() => {}}
-        />
-      )}
+      <YearbookPhotoEditorModal
+        isOpen={isPhotoEditorOpen}
+        onClose={() => {
+          setIsPhotoEditorOpen(false);
+          setEditingEntry(null);
+        }}
+        currentProject={activeProject}
+        initialDate={selectedDateForEditor}
+        existingEntry={editingEntry}
+        onEntrySaved={async () => {
+          const exists = await db.yearbookProjects.get(activeProject.id);
+          if (!exists) {
+            await db.yearbookProjects.put(activeProject);
+            syncYearbookProjectToCloud(activeProject);
+          }
+        }}
+      />
 
-      {activeProject && (
-        <TimelapsePlayerModal
-          isOpen={isTimelapseOpen}
-          onClose={() => setIsTimelapseOpen(false)}
-          entries={entries}
-          currentProject={activeProject}
-        />
-      )}
+      <TimelapsePlayerModal
+        isOpen={isTimelapseOpen}
+        onClose={() => setIsTimelapseOpen(false)}
+        entries={entries}
+        currentProject={activeProject}
+      />
 
       <CreateYearbookModal
         isOpen={isCreateProjectOpen}
