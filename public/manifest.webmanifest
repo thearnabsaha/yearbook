@@ -1,0 +1,56 @@
+{
+  "name": "Yearbook — Daily Photo Timelapse & Creative Studio PWA",
+  "short_name": "Yearbook",
+  "description": "Daily photo yearbook timelapse with automatic eye-alignment, Snapchat captions, and MongoDB cloud sync.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf9f5",
+  "theme_color": "#c27838",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "name",
+      "text": "description",
+      "files": [
+        {
+          "name": "photos",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "New Camera Snap",
+      "short_name": "Camera",
+      "description": "Snap a new photo with live camera",
+      "url": "/?action=camera",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Upload Photos",
+      "short_name": "Upload",
+      "description": "Select photos from your device",
+      "url": "/?action=upload",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["photo", "productivity", "utilities"]
+}
