@@ -505,7 +505,7 @@ export default function YearbookPhotoEditorModal({
 
                   <button
                     type="button"
-                    onClick={() => setAlignment((prev) => ({ ...prev, scale: 0.75, offsetX: 0, offsetY: 0 }))}
+                    onClick={() => setAlignment((prev) => ({ ...prev, scale: 0.8, offsetX: 0, offsetY: 0 }))}
                     className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-stone-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                   >
                     Fit Whole Photo

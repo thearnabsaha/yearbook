@@ -129,7 +129,7 @@ export interface YearbookAlignment {
 export const DEFAULT_ALIGNMENT: YearbookAlignment = {
   offsetX: 0,
   offsetY: 0,
-  scale: 1,
+  scale: 0.8,
   rotation: 0,
 };
 
